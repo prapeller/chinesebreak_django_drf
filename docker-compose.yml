@@ -1,0 +1,32 @@
+version: '3.9'
+
+services:
+  app:
+    container_name: app
+#    build: .
+    image: prapeller/chinesebreak_app
+    restart: always
+    command: >
+      sh -c "python manage.py makemigrations
+      && python manage.py migrate
+      && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./app:/app
+    ports:
+      - 10555:8000
+    depends_on:
+      - db
+
+  db:
+    image: postgres
+    container_name: db
+    environment:
+      - POSTGRES_DB=chinesebreak_db
+      - POSTGRES_USER=chinesebreak
+      - POSTGRES_PASSWORD=superpass
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    volumes:
+      - db:/var/lib/postgresql/data
+
+volumes:
+  db:

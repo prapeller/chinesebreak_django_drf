@@ -1,0 +1,5 @@
+django
+pytz
+psycopg2-binary==2.9.2
+djangorestframework==3.12.4
+pillow
