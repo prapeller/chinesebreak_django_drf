@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    <title> {{ title | title }}</title>
+{% endblock %}
+
+{% block content %}
+
+    <a href="{% url 'admin_panel:lang_list'%}" type="button" class="btn btn-primary">Back</a>
+
+    <div class="header-text">
+        <h1>Language:</h1>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" name="back" value="Update">
+    </form>
+
+    {% if lang.pk %}
+        <a type="button" class="btn btn-danger" href="{% url 'admin_panel:lang_delete' lang.pk %}">Delete</a>
+
+        <h2>Courses:</h2>
+        <div class="list-group">
+            {% for course in courses %}
+                <a class="list-group-item" href="{% url 'admin_panel:course_update' course.pk %}">{{ course }}</a>
+            {% endfor %}
+        </div>
+
+        <a class="btn btn-primary" href="{% url 'admin_panel:course_create' %}">Add course</a>
+    {% endif %}
+
+
+
+
+{% endblock %}

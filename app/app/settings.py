@@ -82,9 +82,12 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'chinesebreak_db',
-        'USER': 'chinesebreak',
-        'PASSWORD': 'superpass',
-        'HOST': 'db',
+        # 'USER': 'chinesebreak',
+        'USER': 'postgres',
+        # 'PASSWORD': 'superpass',
+        'PASSWORD': '4189',
+        'HOST': 'localhost',
+        # 'HOST': 'db',
         'PORT': 5432
     }
 }
