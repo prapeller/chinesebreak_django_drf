@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Character(models.Model):
     char = models.CharField(max_length=64)
     pinyin = models.CharField(max_length=64)

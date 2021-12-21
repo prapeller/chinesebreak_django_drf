@@ -1,4 +1,6 @@
 from django.db import models
+from users.models import User
+
 
 class Lang(models.Model):
     name = models.CharField(max_length=64)

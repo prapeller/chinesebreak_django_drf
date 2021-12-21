@@ -1,4 +1,12 @@
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
+
+from elements.characters.models import Character
+from elements.grammars.models import Grammar
+from elements.words.models import Word
+from structure.lesson.models import Lesson
+from users.models import User
+
 
 class Task(models.Model):
     TASK_TYPES = [
@@ -28,9 +36,9 @@ class Task(models.Model):
 
     task_type = models.CharField(max_length=2, choices=TASK_TYPES)
 
-    word = models.ForeignKey('Word', on_delete=models.CASCADE)
-    grammar = models.ForeignKey('Grammar', on_delete=models.CASCADE)
-    character = models.ForeignKey('Character', on_delete=models.CASCADE)
+    word = models.ForeignKey(Word, on_delete=models.CASCADE)
+    grammar = models.ForeignKey(Grammar, on_delete=models.CASCADE)
+    character = models.ForeignKey(Character, on_delete=models.CASCADE)
 
     # elements
 
@@ -78,8 +86,8 @@ class Task(models.Model):
     # списки с media_id файлов'
     media = models.JSONField(default=default_media)
 
-    creator = models.ForeignKey('User', on_delete=models.SET_NULL, null=True)
-    lesson = models.ForeignKey('Lesson', on_delete=models.CASCADE)
+    creator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
     video = models.FileField()
 
     def __str__(self):

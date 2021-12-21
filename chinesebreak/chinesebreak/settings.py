@@ -45,6 +45,9 @@ INSTALLED_APPS = [
     'structure.topic',
     'structure.lesson',
     'structure.task',
+    'elements.words',
+    'elements.grammars',
+    'elements.characters',
 ]
 
 MIDDLEWARE = [
