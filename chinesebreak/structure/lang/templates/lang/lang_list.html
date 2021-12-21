@@ -1,6 +1,16 @@
 {% extends 'base.html' %}
 
 {% block content %}
-        <h1 class="mt-5">Welcome to the future 🤩</h1>
+
+    {% if object_list %}
+            {% for lang in object_list %}
+                {{ lang }}
+            {% endfor %}
+    {% else %}
+        <h1>No languages yet</h1>
+    {% endif %}
+
+
+
 {% endblock %}
 

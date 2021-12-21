@@ -31,4 +31,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', index),
     path('api/', include(router.urls)),
+    path('lang/', include('structure.lang.urls', namespace='lang')),
 ]
