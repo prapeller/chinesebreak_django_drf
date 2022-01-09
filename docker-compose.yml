@@ -1,29 +1,39 @@
+#docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' db
+
+#docker-compose run --rm app sh -c "python manage.py test"
+
 version: '3.9'
 
 services:
   app:
     container_name: app
-#    build: .
-    image: prapeller/chinesebreak_app
+    build: .
+#    image: prapeller/chinesebreak_django_drf:prapeller
     restart: always
+    ports:
+      - 8000:8000
+    volumes:
+      - ./app:/app
     command: >
       sh -c "python manage.py makemigrations
       && python manage.py migrate
       && python manage.py runserver 0.0.0.0:8000"
-    volumes:
-      - ./app:/app
-    ports:
-      - 10555:8000
+    environment:
+      - SECRET_KEY=supertopsecretkey
+      - DB_HOST=db
+      - DB_NAME=chinesebreak_db
+      - DB_USER=postgres
+      - DB_PASS=supersecretpassword
     depends_on:
       - db
 
   db:
-    image: postgres
+    image: postgres:14-alpine
     container_name: db
     environment:
       - POSTGRES_DB=chinesebreak_db
-      - POSTGRES_USER=chinesebreak
-      - POSTGRES_PASSWORD=superpass
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=secretpass
       - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
       - db:/var/lib/postgresql/data
