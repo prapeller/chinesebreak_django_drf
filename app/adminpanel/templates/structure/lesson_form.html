@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <a href="{% url 'adminpanel:topic_update' object.topic.pk %}">back</a>
+    <br>
+    <h1>Lesson: {{ object }}</h1>
+
+
+    <h1>Tasks:</h1>
+    {% if sub_object_list %}
+        {% for obj in sub_object_list %}
+            <a href="{% url 'adminpanel:task_update' obj.pk %}">{{ obj }}</a>
+            <!-- Button trigger modal -->
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-type="tasks" data-pk="{{ obj.pk }}">
+                Delete
+            </button>
+            <br>
+        {% endfor %}
+    {% else %}
+        <p>No subs yet</p>
+    {% endif %}
+
+    <form method="post" action="{% url 'adminpanel:lesson_update' object.pk %}">
+        {% csrf_token %}
+        {% for field in task_form %}
+            {{ field }}
+            <br>
+        {% endfor %}
+        <input type="submit" class="btn btn-success" value="Create">
+    </form>
+
+    {% include 'structure/includes/inn_delete_modal.html' %}
+
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <a href="{% url 'adminpanel:lang_update' object.lang_id %}">back</a>
+    <br>
+
+    <h1>Course: {{ object }}</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+            {{ field }}
+            <br>
+        {% endfor %}
+        <input type="submit" value="ok">
+    </form>
+
+    <h1>Topics:</h1>
+    {% if sub_object_list %}
+        {% for obj in sub_object_list %}
+            <a href="{% url 'adminpanel:topic_update' obj.pk %}">{{ obj }}</a>
+            <!-- Button trigger modal -->
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-type="topics" data-pk="{{ obj.pk }}">
+                Delete
+            </button>
+            <br>
+        {% endfor %}
+    {% else %}
+        <p>No subs yet</p>
+    {% endif %}
+
+    <div>
+        <a href="{% url 'adminpanel:topic_create' %}" class="btn btn-success" type="button">Create</a>
+    </div>
+
+    {% include 'structure/includes/inn_delete_modal.html' %}
+
+{% endblock %}

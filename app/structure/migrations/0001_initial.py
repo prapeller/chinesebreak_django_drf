@@ -63,7 +63,7 @@ class Migration(migrations.Migration):
                 ('sent_char_W', django.contrib.postgres.fields.ArrayField(base_field=models.CharField(max_length=120), size=None)),
                 ('sent_pinyin_W', django.contrib.postgres.fields.ArrayField(base_field=models.CharField(max_length=120), size=None)),
                 ('sent_lang_W', django.contrib.postgres.fields.ArrayField(base_field=models.CharField(max_length=120), size=None)),
-                ('media', models.JSONField(default=structure.models.Task.default_media)),
+                ('media', models.JSONField(default=structure.models.default_task_media)),
                 ('video', models.FileField(upload_to='')),
                 ('character', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='elements.character')),
                 ('creator', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
