@@ -2,6 +2,7 @@ import os
 from uuid import uuid4
 
 from django.db import models
+from django.core.validators import FileExtensionValidator
 from django.contrib.postgres.fields import ArrayField
 from django.utils.deconstruct import deconstructible
 
@@ -43,7 +44,7 @@ class Lang(models.Model):
     creator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return self.name
+        return f'{self.name}_id_{self.pk}'
 
 
 class Course(models.Model):
@@ -53,17 +54,19 @@ class Course(models.Model):
     lang = models.ForeignKey(Lang, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.name
+        return f'{self.name}_id_{self.pk}'
 
 
 class Topic(models.Model):
     name = models.CharField(max_length=64)
-    image = models.ImageField(upload_to=PathAndRename('images/topics/'), null=True, blank=True)
+    image = models.FileField(upload_to=PathAndRename('images/topics/'),
+                             null=True, blank=True,
+                             validators=[FileExtensionValidator(['svg', 'jpg', 'jpeg', 'png'])])
     creator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.name
+        return f'{self.name}_id_{self.pk}'
 
 
 class Lesson(models.Model):
@@ -71,7 +74,7 @@ class Lesson(models.Model):
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'{self.pk} to topic {self.topic}'
+        return f'lesson_to_{self.topic.name}_id_{self.pk}'
 
 
 class Task(models.Model):
@@ -81,6 +84,7 @@ class Task(models.Model):
         ('3', 'word_lang_from_char'),
         ('4', 'word_char_from_video'),
         ('5', 'word_match'),
+
         ('6', 'sent_image'),
         ('7', 'sent_char_from_lang'),
         ('8', 'sent_lang_from_char'),
@@ -90,24 +94,28 @@ class Task(models.Model):
         ('12', 'sent_paste_from_char'),
         ('13', 'sent_choose_from_char'),
         ('14', 'sent_delete_from_char'),
+
         ('15', 'dialog_A_char_from_char'),
         ('16', 'dialog_B_char_from_video'),
         ('17', 'dialog_A_puzzle_char_from_char'),
         ('18', 'dialog_B_puzzle_char_from_char'),
+
         ('19', 'puzzle_char_from_lang'),
         ('20', 'puzzle_lang_from_char'),
         ('21', 'puzzle_char_from_video'),
+
         ('22', 'draw_character')
     ]
 
     task_type = models.CharField(max_length=2, choices=TASK_TYPES)
+    creator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
 
     word = models.ForeignKey(Word, on_delete=models.CASCADE, null=True)
     grammar = models.ForeignKey(Grammar, on_delete=models.CASCADE, null=True)
     character = models.ForeignKey(Character, on_delete=models.CASCADE, null=True)
 
     # elements
-
     # слова, у которых при прохождении этого задания срабатывает счетчик "правильно"
     words_active_or_to_del = ArrayField(models.IntegerField(), null=True)
     # слова, которые должны отображаться при показе задания пользователю
@@ -118,7 +126,6 @@ class Task(models.Model):
     grammars_wrong = ArrayField(models.IntegerField(), null=True)
 
     # right_sentences
-
     # предлоежние на китайском
     sent_char_A = models.CharField(max_length=120, null=True)
     # предложение на pinyin
@@ -141,9 +148,7 @@ class Task(models.Model):
     # списки с media_id файлов'
     media = models.JSONField(default=default_task_media, null=True)
 
-    creator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
     video = models.FileField(upload_to='media/video', null=True)
 
     def __str__(self):
-        return f'task type: {self.task_type} to {self.lesson}'
+        return f'{self.task_type}_{self.get_task_type_display()}_id_{self.pk}'

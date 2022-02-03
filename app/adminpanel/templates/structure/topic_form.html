@@ -2,36 +2,58 @@
 
 {% block content %}
 
-    <a href="{% url 'adminpanel:course_update' object.course_id %}">back</a>
-    <br>
+    {#    header #}
+    <div class="header">
+        <div class="back-btn-box">
+            <a class="back-btn-small" href="{% url 'adminpanel:course_update' object.course.pk %}"></a>
+        </div>
+        <div class="header-text">
+            <h1 class="display-5 fw-bold">Topic</h1>
+            <p>{{ object }}</p>
+        </div>
+    </div>
 
-    <h1>Topic: {{ object }}</h1>
+    {# image box#}
+    <div class="image-box">
+        <img class="image" src="{{ object.image.url }}" alt="ooops">
+    </div>
 
+    {#  form #}
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {% for field in form %}
-            {{ field }}
-            <br>
-        {% endfor %}
-        <input type="submit" value="ok">
+        <div class="form-group">
+            {{ form.image }}
+            <label class="form-label" for="{{ form.name.auto_id }}">{{ form.name.name }}</label>
+            {{ form.name }}
+            <input type="submit" value="update">
+        </div>
     </form>
 
-    <h1>Lessons:</h1>
-    {% if sub_object_list %}
-        {% for obj in sub_object_list %}
-            <a href="{% url 'adminpanel:lesson_update' obj.pk %}">{{ obj }}</a>
-            <!-- Button trigger modal -->
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-type="lessons" data-pk="{{ obj.pk }}">
-                Delete
-            </button>
-            <br>
-        {% endfor %}
-    {% else %}
-        <p>No subs yet</p>
-    {% endif %}
+    <!-- delete btn -->
+    <div class="d-grid">
+        <button type="button" class="btn_del" data-bs-toggle="modal" data-bs-target="#exampleModal" data-type="topics" data-pk="{{ object.pk }}"></button>
+    </div>
 
-    <div>
-        <a href="{% url 'adminpanel:lesson_create' %}" class="btn btn-success" type="button">Create</a>
+    <!-- subs -->
+    <p class="display-6"> Lessons:</p>
+
+    <div class="list-group">
+        {% if sub_object_list %}
+            {% for obj in sub_object_list %}
+                <div class="btn-group">
+                    <a href="{% url 'adminpanel:lesson_update' obj.pk %}" class="list-group-item list-group-item-action">{{ obj }}</a>
+                    <!-- Button trigger modal delete obj from sub_object_list -->
+                    <button type="button" class="btn btn_del_from_list" data-bs-toggle="modal" data-bs-target="#exampleModal" data-type="lessons" data-pk="{{ obj.pk }}"></button>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No subs yet</p>
+        {% endif %}
+    </div>
+
+    <!-- add sub -->
+    <div class="d-grid">
+        <a class="btn btn_add" href="{% url 'adminpanel:lesson_create' %}" id="add"></a>
     </div>
 
     {% include 'structure/includes/inn_delete_modal.html' %}

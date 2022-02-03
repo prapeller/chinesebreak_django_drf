@@ -2,32 +2,78 @@
 
 {% block content %}
 
-    <a href="{% url 'adminpanel:topic_update' object.topic.pk %}">back</a>
-    <br>
-    <h1>Lesson: {{ object }}</h1>
+    {#    header #}
+    <div class="header">
+        <div class="back-btn-box">
+            <a class="back-btn-small" href="{% url 'adminpanel:topic_update' object.topic.pk %}"></a>
+        </div>
+        <div class="header-text">
+            <h1 class="display-5 fw-bold">Lesson</h1>
+            <p>{{ object }}</p>
+        </div>
+    </div>
 
+    <!-- delete btn -->
+    <div class="d-grid">
+        <button type="button" class="btn_del" data-bs-toggle="modal" data-bs-target="#exampleModal" data-type="topics" data-pk="{{ object.pk }}"></button>
+    </div>
 
-    <h1>Tasks:</h1>
-    {% if sub_object_list %}
-        {% for obj in sub_object_list %}
-            <a href="{% url 'adminpanel:task_update' obj.pk %}">{{ obj }}</a>
-            <!-- Button trigger modal -->
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-type="tasks" data-pk="{{ obj.pk }}">
-                Delete
-            </button>
-            <br>
-        {% endfor %}
-    {% else %}
-        <p>No subs yet</p>
-    {% endif %}
+    <!-- subs -->
+    <p class="display-6"> Tasks:</p>
 
+    <div class="list-group">
+        {% if sub_object_list %}
+            {% for obj in sub_object_list %}
+
+                <div id="sortableList" class="list-group">
+                    <!--		<div id="listWithHandle" class="list-group">-->
+                        {% if obj.task_type in words_task_type_list %}
+                            <div class="btn-group">
+                                <a href="{% url 'adminpanel:task_update' obj.pk %}" class="list-group-item list-group-item-action words-task-type">{{ obj }}</a>
+                                <!-- Button trigger modal delete obj from sub_object_list -->
+                                <button type="button" class="btn btn_del_from_list" data-bs-toggle="modal" data-bs-target="#exampleModal" data-type="tasks" data-pk="{{ obj.pk }}"></button>
+                            </div>
+                        {% endif %}
+
+                        {% if obj.task_type in sent_task_type_list %}
+                            <div class="btn-group">
+                                <a href="{% url 'adminpanel:task_update' obj.pk %}" class="list-group-item list-group-item-action sent-task-type">{{ obj }}</a>
+                                <!-- Button trigger modal delete obj from sub_object_list -->
+                                <button type="button" class="btn btn_del_from_list" data-bs-toggle="modal" data-bs-target="#exampleModal" data-type="tasks" data-pk="{{ obj.pk }}"></button>
+                            </div>
+                        {% endif %}
+                        {##}
+                        {% if obj.task_type in dialog_task_type_list %}
+                            <div class="btn-group">
+                                <a href="{% url 'adminpanel:task_update' obj.pk %}" class="list-group-item list-group-item-action dialog-task-type">{{ obj }}</a>
+                                <!-- Button trigger modal delete obj from sub_object_list -->
+                                <button type="button" class="btn btn_del_from_list" data-bs-toggle="modal" data-bs-target="#exampleModal" data-type="tasks" data-pk="{{ obj.pk }}"></button>
+                            </div>
+                        {% endif %}
+                        {% if obj.task_type in puzzle_task_type_list %}
+                            <div class="btn-group">
+                                <a href="{% url 'adminpanel:task_update' obj.pk %}" class="list-group-item list-group-item-action puzzle-task-type">{{ obj }}</a>
+                                <!-- Button trigger modal delete obj from sub_object_list -->
+                                <button type="button" class="btn btn_del_from_list" data-bs-toggle="modal" data-bs-target="#exampleModal" data-type="tasks" data-pk="{{ obj.pk }}"></button>
+                            </div>
+                        {% endif %}
+                    <!--</div>-->
+                </div>
+
+            {% endfor %}
+        {% else %}
+            <p>No subs yet</p>
+        {% endif %}
+    </div>
+
+    <!-- add sub -->
     <form method="post" action="{% url 'adminpanel:lesson_update' object.pk %}">
         {% csrf_token %}
-        {% for field in task_form %}
-            {{ field }}
-            <br>
+        {% for selct in select_task_type_form %}
+            {{ selct }}
         {% endfor %}
-        <input type="submit" class="btn btn-success" value="Create">
+
+        <input type="submit" class="btn btn_add" value="">
     </form>
 
     {% include 'structure/includes/inn_delete_modal.html' %}

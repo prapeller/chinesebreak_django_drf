@@ -4,7 +4,7 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.views.generic.edit import BaseDeleteView
 
-from adminpanel.forms import TopicForm, LessonForm, TaskForm, CourseForm
+from adminpanel.forms import TopicForm, LessonForm, TaskTypeForm, CourseForm, LangForm
 from structure.models import Lang, Course, Topic, Lesson, Task
 
 
@@ -12,6 +12,9 @@ from structure.models import Lang, Course, Topic, Lesson, Task
 def index(request):
     context = {'title': 'Main'}
     return render(request, 'index.html', context)
+
+
+# class WordListView(ListView)
 
 
 class LangListView(ListView):
@@ -30,7 +33,7 @@ class LangCreateView(CreateView):
 
 class LangUpdateView(UpdateView):
     model = Lang
-    fields = ['name', 'is_published']
+    form_class = LangForm
     extra_context = {'title': 'Lang update'}
 
     def get(self, request, *args, **kwargs):
@@ -143,10 +146,17 @@ class LessonCreateView(CreateView):
             self.success_url = reverse_lazy('adminpanel:lesson_update', kwargs={'pk': self.object.pk})
         return HttpResponseRedirect(self.get_success_url())
 
+def redirect_to_task_type(task_type, task_pk):
+    return HttpResponseRedirect(reverse_lazy(f'adminpanel:task_type_{task_type}_update', kwargs={'pk': task_pk}))
 
 class LessonUpdateView(UpdateView):
     extra_context = {'title': 'Lesson update',
-                     'task_form': TaskForm}
+                     'select_task_type_form': TaskTypeForm,
+                     'words_task_type_list': ['1', '2', '3', '4', '5'],
+                     'sent_task_type_list': ['6', '7', '8', '9', '10', '11', '12', '13', '14'],
+                     'dialog_task_type_list': ['15', '16', '17', '18'],
+                     'puzzle_task_type_list': ['19', '20', '21'],
+                     }
     model = Lesson
     fields = ()
 
@@ -163,26 +173,7 @@ class LessonUpdateView(UpdateView):
                 creator=request.user,
                 lesson=self.get_object()
             )
-            if task_type == '1':
-                return HttpResponseRedirect(reverse_lazy('adminpanel:task_type_1_update', kwargs={'pk': new_task.pk}))
-            if task_type == '2':
-                return HttpResponseRedirect(reverse_lazy('adminpanel:task_type_2_update', kwargs={'pk': new_task.pk}))
-            if task_type == '3':
-                return HttpResponseRedirect(reverse_lazy('adminpanel:task_type_3_update', kwargs={'pk': new_task.pk}))
-            if task_type == '4':
-                return HttpResponseRedirect(reverse_lazy('adminpanel:task_type_4_update', kwargs={'pk': new_task.pk}))
-            if task_type == '5':
-                return HttpResponseRedirect(reverse_lazy('adminpanel:task_type_5_update', kwargs={'pk': new_task.pk}))
-            if task_type == '6':
-                return HttpResponseRedirect(reverse_lazy('adminpanel:task_type_6_update', kwargs={'pk': new_task.pk}))
-            if task_type == '7':
-                return HttpResponseRedirect(reverse_lazy('adminpanel:task_type_7_update', kwargs={'pk': new_task.pk}))
-            if task_type == '8':
-                return HttpResponseRedirect(reverse_lazy('adminpanel:task_type_8_update', kwargs={'pk': new_task.pk}))
-            if task_type == '9':
-                return HttpResponseRedirect(reverse_lazy('adminpanel:task_type_9_update', kwargs={'pk': new_task.pk}))
-            if task_type == '10':
-                return HttpResponseRedirect(reverse_lazy('adminpanel:task_type_10_update', kwargs={'pk': new_task.pk}))
+            return redirect_to_task_type(task_type, new_task.pk)
 
 
 class LessonDeleteView(DeleteView):
@@ -202,6 +193,7 @@ class TaskDeleteView(DeleteView):
         self.success_url = reverse_lazy('adminpanel:lesson_update', kwargs={'pk': self.object.lesson.pk})
         return super().delete(self, request, *args, **kwargs)
 
+
 class TaskUpdateView(UpdateView):
     extra_context = {'title': 'Task update'}
     model = Task
@@ -210,71 +202,140 @@ class TaskUpdateView(UpdateView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         task_type = self.object.task_type
-        if task_type == '1':
-            return HttpResponseRedirect(reverse_lazy('adminpanel:task_type_1_update', kwargs={'pk': self.object.pk}))
-        if task_type == '2':
-            return HttpResponseRedirect(reverse_lazy('adminpanel:task_type_2_update', kwargs={'pk': self.object.pk}))
-        if task_type == '3':
-            return HttpResponseRedirect(reverse_lazy('adminpanel:task_type_3_update', kwargs={'pk': self.object.pk}))
-        if task_type == '4':
-            return HttpResponseRedirect(reverse_lazy('adminpanel:task_type_4_update', kwargs={'pk': self.object.pk}))
-        if task_type == '5':
-            return HttpResponseRedirect(reverse_lazy('adminpanel:task_type_5_update', kwargs={'pk': self.object.pk}))
-        if task_type == '6':
-            return HttpResponseRedirect(reverse_lazy('adminpanel:task_type_6_update', kwargs={'pk': self.object.pk}))
-        if task_type == '7':
-            return HttpResponseRedirect(reverse_lazy('adminpanel:task_type_7_update', kwargs={'pk': self.object.pk}))
-        if task_type == '8':
-            return HttpResponseRedirect(reverse_lazy('adminpanel:task_type_8_update', kwargs={'pk': self.object.pk}))
-        if task_type == '9':
-            return HttpResponseRedirect(reverse_lazy('adminpanel:task_type_9_update', kwargs={'pk': self.object.pk}))
-        if task_type == '10':
-            return HttpResponseRedirect(reverse_lazy('adminpanel:task_type_10_update', kwargs={'pk': self.object.pk}))
-
-        return super().get(request, *args, **kwargs)
+        return redirect_to_task_type(task_type, self.object.pk)
 
 
 class TaskType_1_UpdateView(UpdateView):
     model = Task
     fields = '__all__'
-    template_name = 'structure/tasks/task_type_1.html'
+    template_name = 'structure/tasks/1_word_image.html'
 
 
 class TaskType_2_UpdateView(UpdateView):
     model = Task
     fields = '__all__'
-    template_name = 'structure/tasks/task_type_2.html'
+    template_name = 'structure/tasks/2_word_char_from_lang.html'
 
 
 class TaskType_3_UpdateView(UpdateView):
     model = Task
     fields = '__all__'
-    template_name = 'structure/tasks/task_type_3.html'
+    template_name = 'structure/tasks/3_word_lang_from_char.html'
 
 
 class TaskType_4_UpdateView(UpdateView):
-    pass
+    model = Task
+    fields = '__all__'
+    template_name = 'structure/tasks/4_word_char_from_video.html'
 
 
 class TaskType_5_UpdateView(UpdateView):
-    pass
+    model = Task
+    fields = '__all__'
+    template_name = 'structure/tasks/5_word_match.html'
 
 
 class TaskType_6_UpdateView(UpdateView):
-    pass
+    model = Task
+    fields = '__all__'
+    template_name = 'structure/tasks/6_sent_image.html'
 
 
 class TaskType_7_UpdateView(UpdateView):
-    pass
+    model = Task
+    fields = '__all__'
+    template_name = 'structure/tasks/7_sent_char_from_lang.html'
 
 
 class TaskType_8_UpdateView(UpdateView):
-    pass
+    model = Task
+    fields = '__all__'
+    template_name = 'structure/tasks/8_sent_lang_from_char.html'
 
 
 class TaskType_9_UpdateView(UpdateView):
-    pass
+    model = Task
+    fields = '__all__'
+    template_name = 'structure/tasks/9_sent_lang_from_video.html'
 
 
 class TaskType_10_UpdateView(UpdateView):
-    pass
+    model = Task
+    fields = '__all__'
+    template_name = 'structure/tasks/10_sent_say_from_char.html'
+
+
+class TaskType_11_UpdateView(UpdateView):
+    model = Task
+    fields = '__all__'
+    template_name = 'structure/tasks/11_sent_say_from_video.html'
+
+
+class TaskType_12_UpdateView(UpdateView):
+    model = Task
+    fields = '__all__'
+    template_name = 'structure/tasks/12_sent_paste_from_char.html'
+
+
+class TaskType_13_UpdateView(UpdateView):
+    model = Task
+    fields = '__all__'
+    template_name = 'structure/tasks/13_sent_choose_from_char.html'
+
+
+class TaskType_14_UpdateView(UpdateView):
+    model = Task
+    fields = '__all__'
+    template_name = 'structure/tasks/14_sent_delete_from_char.html'
+
+
+class TaskType_15_UpdateView(UpdateView):
+    model = Task
+    fields = '__all__'
+    template_name = 'structure/tasks/15_dialog_A_char_from_char.html'
+
+
+class TaskType_16_UpdateView(UpdateView):
+    model = Task
+    fields = '__all__'
+    template_name = 'structure/tasks/16_dialog_B_char_from_video.html'
+
+
+class TaskType_17_UpdateView(UpdateView):
+    model = Task
+    fields = '__all__'
+    template_name = 'structure/tasks/17_dialog_A_puzzle_char_from_char.html'
+
+
+class TaskType_18_UpdateView(UpdateView):
+    model = Task
+    fields = '__all__'
+    template_name = 'structure/tasks/18_dialog_B_puzzle_char_from_char.html'
+
+
+class TaskType_19_UpdateView(UpdateView):
+    model = Task
+    fields = '__all__'
+    template_name = 'structure/tasks/19_puzzle_char_from_lang.html'
+
+
+class TaskType_20_UpdateView(UpdateView):
+    model = Task
+    fields = '__all__'
+    template_name = 'structure/tasks/20_puzzle_lang_from_char.html'
+
+
+class TaskType_21_UpdateView(UpdateView):
+    model = Task
+    fields = '__all__'
+    template_name = 'structure/tasks/21_puzzle_char_from_video.html'
+
+class TaskType_22_UpdateView(UpdateView):
+    model = Task
+    fields = '__all__'
+    template_name = 'structure/tasks/22_word_write_from_video.html'
+
+class TaskType_23_UpdateView(UpdateView):
+    model = Task
+    fields = '__all__'
+    template_name = 'structure/tasks/23_grammar_choose_from_video.html'

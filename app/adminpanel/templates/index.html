@@ -1,6 +1,18 @@
 {% extends 'base.html' %}
 
 {% block content %}
-        <h1 class="mt-5">Admin panel index page</h1>
+
+    <h1 class="display-5 fw-bold">Admin panel</h1>
+
+    {% if user.is_authenticated %}
+
+        <p>hello, {{ user.username }}</p>
+
+    {% else %}
+
+        <p>login to continue</p>
+
+    {% endif %}
+
 {% endblock %}
 
