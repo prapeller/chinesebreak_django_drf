@@ -11,7 +11,9 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>{{ title|title }}</title>
+    {% block title %}
+        <title>{{ title|title }}</title>
+    {% endblock %}
 
     <link rel="stylesheet" href="{{ STATIC_PREFIX }}css/style.css">
 

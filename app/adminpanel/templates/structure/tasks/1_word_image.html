@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 
+{% block title %}
+	{{ task_type.id }}_{{ task_type.name }}
+{% endblock %}
+
 {% block content %}
 
     <a href="{% url 'adminpanel:lesson_update' object.lesson.pk %}">back</a>
@@ -17,13 +21,6 @@
 
 {% endblock %}
 
-{#{% extends 'base.html' %}#}
-{##}
-{#{% block title %}#}
-{#	{{ task_type.id }}_{{ task_type.name }}#}
-{#{% endblock %}#}
-{##}
-{##}
 {#{% block content %}#}
 {##}
 {#	<div class="header words-task-type">#}
