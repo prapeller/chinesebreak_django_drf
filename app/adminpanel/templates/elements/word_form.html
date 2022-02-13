@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    {#    header #}
+    <div class="header">
+        <div class="back-btn-box">
+            <a class="back-btn-small" href="{% url 'adminpanel:word_list' %}"></a>
+        </div>
+        <div class="header-text">
+            <h1 class="display-5 fw-bold">Word</h1>
+            <p>{{ object }}</p>
+        </div>
+    </div>
+
+
+    {#  form #}
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+
+            {# pinyin, char, lang, lit #}
+            <label class="form-label" for="{{ form.pinyin.auto_id }}">{{ form.pinyin.name }}</label>
+            {{ form.pinyin }}
+            <label class="form-label" for="{{ form.char.auto_id }}">{{ form.char.name }}</label>
+            {{ form.char }}
+            <label class="form-label" for="{{ form.lang.auto_id }}">{{ form.lang.name }}</label>
+            {{ form.lang }}
+            <label class="form-label" for="{{ form.lit.auto_id }}">{{ form.lit.name }}</label>
+            {{ form.lit }}
+
+            {# image box#}
+            <div class="image-box mt-5">
+                {% if object.image %}
+                    <img class="image" src="{{ object.image.url }}" alt="ooops">
+                {% else %}
+                    <img class="image" src="{{ STATIC_PREFIX }}media/images/topics/no-image.png" alt="ooops">
+                {% endif %}
+            </div>
+            {{ form.image }}
+
+            {# audio box#}
+            <div class="mt-5">
+                {% if object.audio %}
+                    <audio controls class="br_20 shadow_light">
+                        <source src="{{ object.audio.url }}">
+                    </audio>
+                {% else %}
+                    <audio controls class="br_20 shadow_light"></audio>
+                {% endif %}
+            </div>
+            {{ form.audio }}
+
+            <input class="mt-5" type="submit" value="update">
+        </div>
+    </form>
+
+    <!-- delete btn -->
+    <div class="d-grid">
+        <button type="button" class="btn_del" data-bs-toggle="modal" data-bs-target="#exampleModal" data-type="words"
+                data-pk="{{ object.pk }}" data-app="elements"></button>
+    </div>
+
+    <!-- add task word_write_from_video -->
+    <form action="">
+        {% csrf_token %}
+        <div class="d-grid">
+            <a type="submit" class="btn btn_add" href="{% url 'adminpanel:word_update' pk=object.pk %}" id="add"></a>
+        </div>
+    </form>
+
+    {% include 'includes/inn_delete_modal.html' %}
+
+{% endblock %}

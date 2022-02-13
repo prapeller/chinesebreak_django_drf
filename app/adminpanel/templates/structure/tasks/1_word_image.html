@@ -6,9 +6,17 @@
 
 {% block content %}
 
-    <a href="{% url 'adminpanel:lesson_update' object.lesson.pk %}">back</a>
-    <br>
-    <h1>Task: {{ object }}</h1>
+    <div class="header words-task-type">
+        <div class="back-btn-box">
+            <a class="back-btn-small" href="{% url 'adminpanel:lesson_update' object.lesson.pk %}"></a>
+        </div>
+        <div class="header-text">
+            <h1 class="display-5 fw-bold">{{ object.get_task_type_display }}</h1>
+            <p>{{ object }}</p>
+        </div>
+    </div>
+
+<p class="display-6">task_words:</p>
 
     <form method="post">
         {% csrf_token %}
@@ -21,25 +29,7 @@
 
 {% endblock %}
 
-{#{% block content %}#}
-{##}
-{#	<div class="header words-task-type">#}
-{##}
-{#		<form method="POST">#}
-{#			{{ back_btn.hidden_tag() }}#}
-{#			<div class="back-btn-box">#}
-{#				{{ back_btn.back(class="back-btn-small") }}#}
-{#			</div>#}
-{#		</form>#}
-{##}
-{#		<div class="header-text">#}
-{#			<p class="display-5 fw-bold">{{ task_type.id }}_{{ task_type.name }}</p>#}
-{#			<p>{{ task }}</p>#}
-{#		</div>#}
-{#	</div>#}
-{##}
-{#	<p class="display-6">task_words:</p>#}
-{##}
+
 {#	<div class="task-words">#}
 {#		{% for word in task_words %}#}
 {#			{% set word_ind = task_words.index(word) %}#}
@@ -85,9 +75,10 @@
 {#			{% endif %}#}
 {#		{% endfor %}#}
 {#	</div>#}
-{##}
-{#	<p class="display-6">active_elements:</p>#}
-{##}
+
+
+<p class="display-6">active_elements:</p>
+
 {#	<div class="active-elements">#}
 {#		{% for word in active_task_words %}#}
 {#			<div class="task-word-box active-word">#}
@@ -98,7 +89,7 @@
 {#			</div>#}
 {#		{% endfor %}#}
 {#	</div>#}
-{##}
+
 {#	<div class="search_elems">#}
 {#		<div class="search_words">#}
 {#			{% for word in words[:5] %}#}
@@ -107,7 +98,7 @@
 {#					   class="list-group-item list-group-item-action ">{{ word }}</a>#}
 {#				</div>#}
 {#			{% endfor %}#}
-{##}
+
 {#			<form method="POST">#}
 {#				{{ button_add_word.hidden_tag() }}#}
 {#				<div class="d-grid">#}
@@ -116,8 +107,7 @@
 {#			</form>#}
 {#		</div>#}
 {#	</div>#}
-{##}
-{##}
+
 {#	<form method="POST">#}
 {#		{{ button_delete_task.hidden_tag() }}#}
 {#		<div class="d-grid">#}
@@ -125,4 +115,3 @@
 {#		</div>#}
 {#	</form>#}
 {##}
-{#{% endblock %}#}

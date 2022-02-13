@@ -4,8 +4,9 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.views.generic.edit import BaseDeleteView
 
-from adminpanel.forms import TopicForm, LessonForm, TaskTypeForm, CourseForm, LangForm
+from adminpanel.forms import WordForm, GrammarForm, TopicForm, LessonForm, SelectTaskTypeForm, CourseForm, LangForm
 from structure.models import Lang, Course, Topic, Lesson, Task
+from elements.models import Word, Grammar, Character
 
 
 @user_passes_test(lambda u: u is not None and u.is_staff)
@@ -14,7 +15,40 @@ def index(request):
     return render(request, 'index.html', context)
 
 
-# class WordListView(ListView)
+
+class GrammarListView(ListView):
+    model = Grammar
+    extra_context = {'title': 'Grammar list'}
+
+
+class GrammarCreateView(CreateView):
+    def get(self, request, *args, **kwargs):
+        self.object = Grammar.objects.create(
+            name='name',
+            explanation = 'explanation',
+            char = 'char',
+            pinyin = 'pinyin',
+            lang = 'lang',
+            lit = 'lit',
+            structure = 'structure',
+        )
+        return HttpResponseRedirect(reverse_lazy('adminpanel:grammar_update', kwargs={'pk': self.object.pk}))
+
+
+class GrammarUpdateView(UpdateView):
+    model = Grammar
+    form_class = GrammarForm
+    extra_context = {'title': 'Grammar update'}
+
+    def form_valid(self, form):
+        self.object = form.save()
+        self.success_url = reverse_lazy('adminpanel:grammar_update', kwargs={'pk': self.object.pk})
+        return super().form_valid(form)
+
+
+class GrammarDeleteView(BaseDeleteView):
+    model = Grammar
+    success_url = reverse_lazy('adminpanel:word_list')
 
 
 class LangListView(ListView):
@@ -146,12 +180,14 @@ class LessonCreateView(CreateView):
             self.success_url = reverse_lazy('adminpanel:lesson_update', kwargs={'pk': self.object.pk})
         return HttpResponseRedirect(self.get_success_url())
 
+
 def redirect_to_task_type(task_type, task_pk):
     return HttpResponseRedirect(reverse_lazy(f'adminpanel:task_type_{task_type}_update', kwargs={'pk': task_pk}))
 
+
 class LessonUpdateView(UpdateView):
     extra_context = {'title': 'Lesson update',
-                     'select_task_type_form': TaskTypeForm,
+                     'select_task_type_form': SelectTaskTypeForm,
                      'words_task_type_list': ['1', '2', '3', '4', '5'],
                      'sent_task_type_list': ['6', '7', '8', '9', '10', '11', '12', '13', '14'],
                      'dialog_task_type_list': ['15', '16', '17', '18'],
@@ -330,12 +366,62 @@ class TaskType_21_UpdateView(UpdateView):
     fields = '__all__'
     template_name = 'structure/tasks/21_puzzle_char_from_video.html'
 
+
 class TaskType_22_UpdateView(UpdateView):
     model = Task
     fields = '__all__'
     template_name = 'structure/tasks/22_word_write_from_video.html'
 
+
 class TaskType_23_UpdateView(UpdateView):
     model = Task
     fields = '__all__'
     template_name = 'structure/tasks/23_grammar_choose_from_video.html'
+
+
+
+
+
+class WordListView(ListView):
+    model = Word
+    extra_context = {'title': 'Word list'}
+    ordering = ['id']
+
+
+class WordCreateView(CreateView):
+    def get(self, request, *args, **kwargs):
+        self.object = Word.objects.create(
+            char='新的',
+            pinyin='xīn de',
+            lang='translation',
+            lit='literal translation',
+        )
+        return HttpResponseRedirect(reverse_lazy('adminpanel:word_update', kwargs={'pk': self.object.pk}))
+
+
+class WordUpdateView(UpdateView):
+    model = Word
+    form_class = WordForm
+    extra_context = {'title': 'Word update'}
+
+    def form_valid(self, form):
+        self.object = form.save()
+        self.success_url = reverse_lazy('adminpanel:word_update', kwargs={'pk': self.object.pk})
+        return super().form_valid(form)
+
+    def post(self, request, *args, **kwargs):
+        task_type = request.POST.get('task_type')
+        if task_type:
+            new_task = Task.objects.create(
+                task_type=task_type,
+                creator=request.user,
+            )
+            return redirect_to_task_type(task_type, new_task.pk)
+        return super().post(request, *args, **kwargs)
+
+
+class WordDeleteView(BaseDeleteView):
+    model = Word
+    success_url = reverse_lazy('adminpanel:word_list')
+
+

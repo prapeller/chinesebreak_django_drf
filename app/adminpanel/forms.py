@@ -1,6 +1,7 @@
 from django import forms
 
 from structure.models import Lang, Course, Topic, Lesson, Task
+from elements.models import Word, Grammar, Character
 
 
 class LangForm(forms.ModelForm):
@@ -18,9 +19,6 @@ class CourseForm(forms.ModelForm):
         model = Course
         fields = ('name',)
 
-    def save(self, commit=True):
-        return super().save()
-
 
 class TopicForm(forms.ModelForm):
     name = forms.CharField(label='name', max_length=50, widget=forms.TextInput(attrs={'class': 'form-control'}))
@@ -37,9 +35,30 @@ class LessonForm(forms.ModelForm):
         fields = ('topic',)
 
 
-class TaskTypeForm(forms.ModelForm):
-    task_type = forms.ChoiceField(choices=Task.TASK_TYPES, widget=forms.Select(attrs={'class': 'form-select'}))
+class SelectTaskTypeForm(forms.Form):
+    task_type = forms.CharField(widget=forms.Select(choices=Task.TASK_TYPES, attrs={'class': 'form-select'}))
+
+
+class WordForm(forms.ModelForm):
+    pinyin = forms.CharField(label='pinyin', max_length=50, widget=forms.TextInput(attrs={'class': 'form-control'}),
+                             required=False)
+    char = forms.CharField(label='char', max_length=50, widget=forms.TextInput(attrs={'class': 'form-control'}),
+                           required=False)
+    lang = forms.CharField(label='lang', max_length=50, widget=forms.TextInput(attrs={'class': 'form-control'}),
+                           required=False)
+    lit = forms.CharField(label='lit', max_length=50, widget=forms.TextInput(attrs={'class': 'form-control'}),
+                          required=False)
+
+    image = forms.FileField(label='image', widget=forms.FileInput(attrs={'class': 'form-control'}), required=False)
+    audio = forms.FileField(label='audio', widget=forms.FileInput(attrs={'class': 'form-control'}), required=False)
+    video = forms.FileField(label='video', widget=forms.FileInput(attrs={'class': 'form-control'}), required=False)
 
     class Meta:
-        model = Task
-        fields = ('task_type',)
+        model = Word
+        fields = '__all__'
+
+
+class GrammarForm(forms.ModelForm):
+    class Meta:
+        model = Grammar
+        fields = '__all__'

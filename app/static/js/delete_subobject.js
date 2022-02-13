@@ -3,11 +3,12 @@
 
 $('#exampleModal').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget)
+    let app = button.data('app')
     let obj_type = button.data('type')
     let obj_pk = button.data('pk')
     var modal = $(this)
     modal.find('.modal-title').text(`Deleting ${obj_pk} from ${obj_type}`)
-    modal.find('.delete-form').attr('action', `/adminpanel/structure/${obj_type}/delete/${obj_pk}/`)
+    modal.find('.delete-form').attr('action', `/adminpanel/${app}/${obj_type}/delete/${obj_pk}/`)
 
     // $.ajax(
     //     {

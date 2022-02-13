@@ -104,12 +104,14 @@ class Task(models.Model):
         ('20', 'puzzle_lang_from_char'),
         ('21', 'puzzle_char_from_video'),
 
-        ('22', 'draw_character')
+        ('22', 'word_write_from_video'),
+        ('23', 'grammar_choose_from_video'),
+        ('24', 'draw_character')
     ]
 
     task_type = models.CharField(max_length=2, choices=TASK_TYPES)
     creator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, null=True)
 
     word = models.ForeignKey(Word, on_delete=models.CASCADE, null=True)
     grammar = models.ForeignKey(Grammar, on_delete=models.CASCADE, null=True)
