@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    {#    header #}
+    <div class="header">
+        <div class="back-btn-box">
+            <a class="back-btn-small" href="{% url 'adminpanel:word_list' %}"></a>
+        </div>
+        <div class="header-text">
+            <h1 class="display-5 fw-bold">Grammar</h1>
+            <p>{{ object }}</p>
+        </div>
+    </div>
+
+
+    {#  form #}
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+
+            {% for field in form %}
+                {{ field }}
+            {% endfor %}
+
+
+            <div class="d-grid">
+                <input type="submit" class="btn btn_ok mt-2 mb-2" value=""/>
+            </div>
+        </div>
+    </form>
+
+    <!-- delete btn -->
+    <div class="d-grid">
+        <button type="button" class="btn_del" data-bs-toggle="modal" data-bs-target="#exampleModal" data-type="grammars"
+                data-pk="{{ object.pk }}" data-app="elements"></button>
+    </div>
+
+    <!-- add task grammar_choose_from_video -->
+    <form action="{% url 'adminpanel:grammar_update' pk=object.pk %}" method="post">
+        {% csrf_token %}
+        <div class="d-grid">
+            <input type="hidden" name="task_type" value="23">
+            <input type="submit" class="btn btn_add_video_task" value="">
+        </div>
+    </form>
+
+    {% include 'includes/inn_delete_modal.html' %}
+
+{% endblock %}

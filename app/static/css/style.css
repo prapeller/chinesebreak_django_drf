@@ -54,6 +54,15 @@
     background-color: transparent;
     margin: auto;
 }
+.btn_ok {
+    width: 62px;
+    height: 62px;
+    background-image: url("../media/images/ok.svg");
+    background-repeat: no-repeat;
+    border: none;
+    background-color: transparent;
+    margin: auto;
+}
 
 .btn_add {
     margin: 15px auto;

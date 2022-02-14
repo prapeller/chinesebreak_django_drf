@@ -25,18 +25,6 @@ class PathAndRename(object):
         return os.path.join(self.sub_path, filename)
 
 
-def default_task_media():
-    return {
-        # - картинки вариантов ответа для заданий sent_image предложений'
-        "sent_images_id": [],
-        # картинка правильного варианта ответа
-        "sent_images_id_right": [],
-        "sent_video_id": [],
-        "sent_audio_A_id": [],
-        # аудио второй реплики(для диалогов)
-        "sent_audio_B_id": []
-    }
-
 
 class Lang(models.Model):
     name = models.CharField(max_length=64)
@@ -76,6 +64,26 @@ class Lesson(models.Model):
     def __str__(self):
         return f'lesson_to_{self.topic.name}_id_{self.pk}'
 
+    # списки с media_id файлов'
+
+
+def default_task_media():
+    return {
+        # картинки вариантов ответа для заданий sent_image предложений':[[id, 0], [id, 1]]: 1/0 -> правильно/неправильно
+        "sent_images_id": [[], []],
+        # видео
+        "video_id": [],
+        # аудио реплик
+        "sent_audio_A_id": [],
+        "sent_audio_B_id": []
+    }
+
+def default_1d_array():
+    return []
+
+def default_2d_array():
+    return [[],]
+
 
 class Task(models.Model):
     TASK_TYPES = [
@@ -113,19 +121,22 @@ class Task(models.Model):
     creator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, null=True)
 
-    word = models.ForeignKey(Word, on_delete=models.CASCADE, null=True)
-    grammar = models.ForeignKey(Grammar, on_delete=models.CASCADE, null=True)
-    character = models.ForeignKey(Character, on_delete=models.CASCADE, null=True)
-
-    # elements
-    # слова, у которых при прохождении этого задания срабатывает счетчик "правильно"
-    words_active_or_to_del = ArrayField(models.IntegerField(), null=True)
-    # слова, которые должны отображаться при показе задания пользователю
-    words_to_display = ArrayField(models.IntegerField(), null=True)
+    # связанное слово
+    word = models.ForeignKey(Word, on_delete=models.SET_NULL, null=True)
+    # используемые слова [[id, 1, 1], [id, 0, 0]]: 1/0 -> активно/неактивно, 1/0 -> показывается/не показывается
+    words = ArrayField(ArrayField(models.IntegerField(), null=True), null=True, default=default_2d_array)
     # неправильные слова
-    words_wrong = ArrayField(models.IntegerField(), null=True)
+    words_wrong = ArrayField(models.IntegerField(), null=True, default=default_1d_array)
+
+    # связанная грамматика
+    grammar = models.ForeignKey(Grammar, on_delete=models.SET_NULL, null=True)
+    # используемые в предложениях грамматики [[id, 1], [id, 0]]: 1/0 -> активно/неактивно
+    grammars = ArrayField(ArrayField(models.IntegerField(), null=True), null=True, default=default_2d_array)
     # неправильные грамматики
-    grammars_wrong = ArrayField(models.IntegerField(), null=True)
+    grammars_wrong = ArrayField(models.IntegerField(), null=True, default=default_1d_array)
+
+    # связанный иероглиф
+    character = models.ForeignKey(Character, on_delete=models.CASCADE, null=True)
 
     # right_sentences
     # предлоежние на китайском
@@ -143,11 +154,10 @@ class Task(models.Model):
     sent_lit_B = models.CharField(max_length=120, null=True)
 
     # 'смысл как в right_sentences, только это списки с неправильными вариантами предложений
-    sent_char_W = ArrayField(models.CharField(max_length=120), null=True)
-    sent_pinyin_W = ArrayField(models.CharField(max_length=120), null=True)
-    sent_lang_W = ArrayField(models.CharField(max_length=120), null=True)
+    sent_char_W = ArrayField(models.CharField(max_length=120), null=True, default=default_1d_array)
+    sent_pinyin_W = ArrayField(models.CharField(max_length=120), null=True, default=default_1d_array)
+    sent_lang_W = ArrayField(models.CharField(max_length=120), null=True, default=default_1d_array)
 
-    # списки с media_id файлов'
     media = models.JSONField(default=default_task_media, null=True)
 
     video = models.FileField(upload_to='media/video', null=True)

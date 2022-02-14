@@ -40,18 +40,22 @@ class SelectTaskTypeForm(forms.Form):
 
 
 class WordForm(forms.ModelForm):
-    pinyin = forms.CharField(label='pinyin', max_length=50, widget=forms.TextInput(attrs={'class': 'form-control'}),
-                             required=False)
-    char = forms.CharField(label='char', max_length=50, widget=forms.TextInput(attrs={'class': 'form-control'}),
-                           required=False)
-    lang = forms.CharField(label='lang', max_length=50, widget=forms.TextInput(attrs={'class': 'form-control'}),
-                           required=False)
-    lit = forms.CharField(label='lit', max_length=50, widget=forms.TextInput(attrs={'class': 'form-control'}),
-                          required=False)
+    pinyin = forms.CharField(label='pinyin', widget=forms.TextInput(attrs={'class': 'form-control'}), required=False)
+    char = forms.CharField(label='char', widget=forms.TextInput(attrs={'class': 'form-control'}), required=False)
+    lang = forms.CharField(label='lang', widget=forms.TextInput(attrs={'class': 'form-control'}), required=False)
+    lit = forms.CharField(label='lit', widget=forms.TextInput(attrs={'class': 'form-control'}), required=False)
 
     image = forms.FileField(label='image', widget=forms.FileInput(attrs={'class': 'form-control'}), required=False)
+    image_url = forms.URLField(label='image_url', widget=forms.URLInput(attrs={'class': 'form-control'}),
+                               required=False)
+
     audio = forms.FileField(label='audio', widget=forms.FileInput(attrs={'class': 'form-control'}), required=False)
+    audio_url = forms.URLField(label='audio_url', widget=forms.URLInput(attrs={'class': 'form-control'}),
+                               required=False)
+
     video = forms.FileField(label='video', widget=forms.FileInput(attrs={'class': 'form-control'}), required=False)
+    video_url = forms.URLField(label='video_url', widget=forms.URLInput(attrs={'class': 'form-control'}),
+                               required=False)
 
     class Meta:
         model = Word
@@ -59,6 +63,16 @@ class WordForm(forms.ModelForm):
 
 
 class GrammarForm(forms.ModelForm):
+    name = forms.CharField(label='name', widget=forms.TextInput(attrs={'class': 'form-control'}), required=False)
+    explanation = forms.CharField(label='explanation', widget=forms.TextInput(attrs={'class': 'form-control'}),
+                                  required=False)
+    char = forms.CharField(label='char', widget=forms.TextInput(attrs={'class': 'form-control'}), required=False)
+    pinyin = forms.CharField(label='pinyin', widget=forms.TextInput(attrs={'class': 'form-control'}), required=False)
+    lang = forms.CharField(label='lang', widget=forms.TextInput(attrs={'class': 'form-control'}), required=False)
+    lit = forms.CharField(label='lit', widget=forms.TextInput(attrs={'class': 'form-control'}), required=False)
+    structure = forms.CharField(label='structure', widget=forms.TextInput(attrs={'class': 'form-control'}),
+                                required=False)
+
     class Meta:
         model = Grammar
         fields = '__all__'

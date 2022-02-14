@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-	{{ task_type.id }}_{{ task_type.name }}
+    {{ task_type.id }}_{{ task_type.name }}
 {% endblock %}
 
 {% block content %}
@@ -16,16 +16,14 @@
         </div>
     </div>
 
-<p class="display-6">task_words:</p>
+    <p class="display-6">task_words:</p>
 
-    <form method="post">
-        {% csrf_token %}
-        {% for field in form %}
-            {{ field }}
-            <br>
+    <div class="task-words">
+        {% for task_word in task_words %}
+            {{ task_word }}
         {% endfor %}
-        <input type="submit" value="ok">
-    </form>
+
+    </div>
 
 {% endblock %}
 

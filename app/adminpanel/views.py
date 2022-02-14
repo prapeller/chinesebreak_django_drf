@@ -7,48 +7,13 @@ from django.views.generic.edit import BaseDeleteView
 from adminpanel.forms import WordForm, GrammarForm, TopicForm, LessonForm, SelectTaskTypeForm, CourseForm, LangForm
 from structure.models import Lang, Course, Topic, Lesson, Task
 from elements.models import Word, Grammar, Character
+import requests
 
 
 @user_passes_test(lambda u: u is not None and u.is_staff)
 def index(request):
     context = {'title': 'Main'}
     return render(request, 'index.html', context)
-
-
-
-class GrammarListView(ListView):
-    model = Grammar
-    extra_context = {'title': 'Grammar list'}
-
-
-class GrammarCreateView(CreateView):
-    def get(self, request, *args, **kwargs):
-        self.object = Grammar.objects.create(
-            name='name',
-            explanation = 'explanation',
-            char = 'char',
-            pinyin = 'pinyin',
-            lang = 'lang',
-            lit = 'lit',
-            structure = 'structure',
-        )
-        return HttpResponseRedirect(reverse_lazy('adminpanel:grammar_update', kwargs={'pk': self.object.pk}))
-
-
-class GrammarUpdateView(UpdateView):
-    model = Grammar
-    form_class = GrammarForm
-    extra_context = {'title': 'Grammar update'}
-
-    def form_valid(self, form):
-        self.object = form.save()
-        self.success_url = reverse_lazy('adminpanel:grammar_update', kwargs={'pk': self.object.pk})
-        return super().form_valid(form)
-
-
-class GrammarDeleteView(BaseDeleteView):
-    model = Grammar
-    success_url = reverse_lazy('adminpanel:word_list')
 
 
 class LangListView(ListView):
@@ -245,6 +210,15 @@ class TaskType_1_UpdateView(UpdateView):
     model = Task
     fields = '__all__'
     template_name = 'structure/tasks/1_word_image.html'
+    extra_context = {
+        'title': '1_word_image',
+    }
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        task_words = Word.objects.filter(id__in=self.object.words)
+        self.extra_context.update(task_words = task_words) if task_words else [],
+        return super().get(request, *args, **kwargs)
 
 
 class TaskType_2_UpdateView(UpdateView):
@@ -382,6 +356,9 @@ class TaskType_23_UpdateView(UpdateView):
 
 
 
+
+
+
 class WordListView(ListView):
     model = Word
     extra_context = {'title': 'Word list'}
@@ -406,6 +383,10 @@ class WordUpdateView(UpdateView):
 
     def form_valid(self, form):
         self.object = form.save()
+        if form.data.get('audio_url') and not form.data.get('audio'):
+            self.object.save_audio_with_url(form.data.get('audio_url'))
+        if self.request.POST.get('image_url') and not self.request.POST.get('image'):
+            self.object.save_image_with_url(form.data.get('image_url'))
         self.success_url = reverse_lazy('adminpanel:word_update', kwargs={'pk': self.object.pk})
         return super().form_valid(form)
 
@@ -415,6 +396,7 @@ class WordUpdateView(UpdateView):
             new_task = Task.objects.create(
                 task_type=task_type,
                 creator=request.user,
+                word=self.object,
             )
             return redirect_to_task_type(task_type, new_task.pk)
         return super().post(request, *args, **kwargs)
@@ -423,5 +405,51 @@ class WordUpdateView(UpdateView):
 class WordDeleteView(BaseDeleteView):
     model = Word
     success_url = reverse_lazy('adminpanel:word_list')
+
+
+class GrammarListView(ListView):
+    model = Grammar
+    extra_context = {'title': 'Grammar list'}
+
+
+class GrammarCreateView(CreateView):
+    def get(self, request, *args, **kwargs):
+        self.object = Grammar.objects.create(
+            name='name',
+            explanation = 'explanation',
+            char = 'char',
+            pinyin = 'pinyin',
+            lang = 'lang',
+            lit = 'lit',
+            structure = 'structure',
+        )
+        return HttpResponseRedirect(reverse_lazy('adminpanel:grammar_update', kwargs={'pk': self.object.pk}))
+
+
+class GrammarUpdateView(UpdateView):
+    model = Grammar
+    form_class = GrammarForm
+    extra_context = {'title': 'Grammar update'}
+
+    def form_valid(self, form):
+        self.object = form.save()
+        self.success_url = reverse_lazy('adminpanel:grammar_update', kwargs={'pk': self.object.pk})
+        return super().form_valid(form)
+
+    def post(self, request, *args, **kwargs):
+        task_type = request.POST.get('task_type')
+        if task_type:
+            new_task = Task.objects.create(
+                task_type=task_type,
+                creator=request.user,
+                grammar=self.object,
+            )
+            return redirect_to_task_type(task_type, new_task.pk)
+        return super().post(request, *args, **kwargs)
+
+
+class GrammarDeleteView(BaseDeleteView):
+    model = Grammar
+    success_url = reverse_lazy('adminpanel:grammar_list')
 
 

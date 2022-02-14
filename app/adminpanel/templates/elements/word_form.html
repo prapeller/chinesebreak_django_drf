@@ -30,14 +30,20 @@
             {{ form.lit }}
 
             {# image box#}
-            <div class="image-box mt-5">
+            <div class="image-box shadow_light mt-4 mb-2">
                 {% if object.image %}
                     <img class="image" src="{{ object.image.url }}" alt="ooops">
                 {% else %}
                     <img class="image" src="{{ STATIC_PREFIX }}media/images/topics/no-image.png" alt="ooops">
                 {% endif %}
+
+                <div class="image_bottom">
+                    <div class="ib_pinyin">{{ object.pinyin }}</div>
+                    <div class="ib_char">{{ object.char }}</div>
+                </div>
             </div>
             {{ form.image }}
+            {{ form.image_url }}
 
             {# audio box#}
             <div class="mt-5">
@@ -50,8 +56,11 @@
                 {% endif %}
             </div>
             {{ form.audio }}
+            {{ form.audio_url }}
 
-            <input class="mt-5" type="submit" value="update">
+            <div class="d-grid">
+                <input type="submit" class="btn btn_ok mt-2 mb-2" value=""></input>
+            </div>
         </div>
     </form>
 
@@ -62,10 +71,11 @@
     </div>
 
     <!-- add task word_write_from_video -->
-    <form action="">
+    <form action="{% url 'adminpanel:word_update' pk=object.pk %}" method="post">
         {% csrf_token %}
         <div class="d-grid">
-            <a type="submit" class="btn btn_add" href="{% url 'adminpanel:word_update' pk=object.pk %}" id="add"></a>
+            <input type="hidden" name="task_type" value="22">
+            <input type="submit" class="btn btn_add_video_task" value="">
         </div>
     </form>
 
