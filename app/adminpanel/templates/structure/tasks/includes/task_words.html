@@ -1,0 +1,32 @@
+<div class="task-words">
+    {% for word_idx, word, is_active in task_words %}
+        {% if is_active %}
+            <div class="task-word" data-word_idx="{{ word_idx }}" data-task_pk="{{ object.pk }}">
+                <div class="task-word-box active-word">
+                    <div class="cb_pinyin">{{ word.pinyin }}</div>
+                    <div class="cb_char">{{ word.char }}</div>
+                </div>
+                <div class="right-up-btn-box">
+                    <button href="" class="btn-close"></button>
+                </div>
+                <div class="under-word-btn-box form-switch">
+                    <input href="" type="checkbox" class="form-check-input word-checkbox" checked>
+                </div>
+            </div>
+
+        {% else %}
+            <div class="task-word" data-word_idx="{{ word_idx }}" data-task_pk="{{ object.pk }}">
+                <div class="task-word-box inactive-word">
+                    <div class="cb_pinyin">{{ word.pinyin }}</div>
+                    <div class="cb_char">{{ word.char }}</div>
+                </div>
+                <div class="right-up-btn-box">
+                    <button href="" class="btn-close"></button>
+                </div>
+                <div class="under-word-btn-box form-switch">
+                    <input href="" type="checkbox" class="form-check-input word-checkbox">
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>

@@ -330,13 +330,22 @@
     flex-wrap: wrap;
 }
 
-.active-word-checkbox {
+.word-checkbox:checked {
     background-color: #929CFF !important;
+    border-color: #929CFF !important;
+}
+.word-checkbox {
+    background-color: #f7f9ff !important;
+    border-color: #bdbdbd !important;
 }
 
-.active-grammar-checkbox {
+.grammar-checkbox:checked {
     background-color: #ffce9d !important;
     border-color: #ffce9d !important;
+}
+.grammar-checkbox {
+    background-color: #f7f9ff !important;
+    border-color: #bdbdbd !important;
 }
 
 

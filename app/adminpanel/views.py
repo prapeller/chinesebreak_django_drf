@@ -1,13 +1,14 @@
 from django.contrib.auth.decorators import user_passes_test
+from django.http import JsonResponse
 from django.shortcuts import render, HttpResponseRedirect
+from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.views.generic.edit import BaseDeleteView
 
-from adminpanel.forms import WordForm, GrammarForm, TopicForm, LessonForm, SelectTaskTypeForm, CourseForm, LangForm
+from adminpanel.forms import WordForm, GrammarForm, TopicForm, SelectTaskTypeForm, CourseForm, LangForm, TaskVideoForm
+from elements.models import Word, Grammar
 from structure.models import Lang, Course, Topic, Lesson, Task
-from elements.models import Word, Grammar, Character
-import requests
 
 
 @user_passes_test(lambda u: u is not None and u.is_staff)
@@ -163,7 +164,7 @@ class LessonUpdateView(UpdateView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        self.extra_context.update({'sub_object_list': Task.objects.filter(lesson=self.object)})
+        self.extra_context.update({'sub_object_list': Task.objects.filter(lesson=self.object).order_by('id')})
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
@@ -196,7 +197,6 @@ class TaskDeleteView(DeleteView):
 
 
 class TaskUpdateView(UpdateView):
-    extra_context = {'title': 'Task update'}
     model = Task
     fields = ()
 
@@ -206,43 +206,139 @@ class TaskUpdateView(UpdateView):
         return redirect_to_task_type(task_type, self.object.pk)
 
 
+def task_update_with_ajax(request, pk):
+    task = Task.objects.get(pk=pk)
+
+    act_deact_word_idx = request.GET.get('act_deact_word_idx')
+    remove_word_idx = request.GET.get('remove_word_idx')
+    add_word_id = request.GET.get('add_word_id')
+
+    if act_deact_word_idx:
+        idx = int(act_deact_word_idx)
+        word = task.words[idx]
+        word[1] = 0 if word[1] == 1 else 1
+        task.save()
+
+    if remove_word_idx:
+        idx = int(remove_word_idx)
+        task.words.pop(idx)
+        task.save()
+
+    if add_word_id:
+        id = int(add_word_id)
+        task.words.append([id, 0])
+        task.save()
+
+    task_words = [(idx, Word.objects.get(id=word[0]), word[1]) for idx, word in enumerate(task.words)]
+    context = {'object': Task.objects.get(pk=pk),
+               'task_words': task_words,
+               }
+    task_words_html = render_to_string(f'structure/tasks/includes/task_words.html', context, request)
+    active_elements_html = render_to_string(f'structure/tasks/includes/active_elements.html', context, request)
+    return JsonResponse({
+        'active_elements_html': active_elements_html,
+        'task_words_html': task_words_html,
+    })
+
+
 class TaskType_1_UpdateView(UpdateView):
     model = Task
-    fields = '__all__'
-    template_name = 'structure/tasks/1_word_image.html'
-    extra_context = {
-        'title': '1_word_image',
-    }
+    fields = ()
+    extra_context = {}
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        task_words = Word.objects.filter(id__in=self.object.words)
-        self.extra_context.update(task_words = task_words) if task_words else [],
+        self.template_name = f'structure/tasks/{self.object.task_type}_{self.object.get_task_type_display()}.html'
+        task_words = [(idx, Word.objects.get(id=word[0]), word[1]) for idx, word in enumerate(self.object.words)]
+        words = Word.objects.all()
+        self.extra_context.update({
+            'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
+            'task_words': task_words,
+            'words': words,
+        })
         return super().get(request, *args, **kwargs)
 
 
 class TaskType_2_UpdateView(UpdateView):
     model = Task
-    fields = '__all__'
-    template_name = 'structure/tasks/2_word_char_from_lang.html'
+    fields = ()
+    extra_context = {}
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.template_name = f'structure/tasks/{self.object.task_type}_{self.object.get_task_type_display()}.html'
+        task_words = [(idx, Word.objects.get(id=word[0]), word[1]) for idx, word in enumerate(self.object.words)]
+        words = Word.objects.all()
+        self.extra_context.update({
+            'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
+            'task_words': task_words,
+            'words': words,
+        })
+        return super().get(request, *args, **kwargs)
 
 
 class TaskType_3_UpdateView(UpdateView):
     model = Task
-    fields = '__all__'
-    template_name = 'structure/tasks/3_word_lang_from_char.html'
+    fields = ()
+    extra_context = {}
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.template_name = f'structure/tasks/{self.object.task_type}_{self.object.get_task_type_display()}.html'
+        task_words = [(idx, Word.objects.get(id=word[0]), word[1]) for idx, word in enumerate(self.object.words)]
+        words = Word.objects.all()
+        self.extra_context.update({
+            'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
+            'task_words': task_words,
+            'words': words,
+        })
+        return super().get(request, *args, **kwargs)
 
 
 class TaskType_4_UpdateView(UpdateView):
     model = Task
-    fields = '__all__'
-    template_name = 'structure/tasks/4_word_char_from_video.html'
+    fields = ()
+    extra_context = {}
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.template_name = f'structure/tasks/{self.object.task_type}_{self.object.get_task_type_display()}.html'
+        self.success_url = reverse_lazy('adminpanel:task_type_4_update', kwargs={'pk': self.object.pk})
+        task_words = [(idx, Word.objects.get(id=word[0]), word[1]) for idx, word in enumerate(self.object.words)]
+        words = Word.objects.all()
+        self.extra_context.update({
+            'video_form': TaskVideoForm(instance=self.object),
+            'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
+            'task_words': task_words,
+            'words': words,
+        })
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        if form.files.get('video'):
+            self.object.save_video_with_file(form.files.get('video'))
+        if form.data.get('video_url') and not form.files.get('video'):
+            self.object.save_video_with_url(form.data.get('video_url'))
+        self.success_url = reverse_lazy('adminpanel:task_type_4_update', kwargs={'pk': self.object.pk})
+        return super().form_valid(form)
 
 
 class TaskType_5_UpdateView(UpdateView):
     model = Task
-    fields = '__all__'
-    template_name = 'structure/tasks/5_word_match.html'
+    fields = ()
+    extra_context = {}
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.template_name = f'structure/tasks/{self.object.task_type}_{self.object.get_task_type_display()}.html'
+        task_words = [(idx, Word.objects.get(id=word[0]), word[1]) for idx, word in enumerate(self.object.words)]
+        words = Word.objects.all()
+        self.extra_context.update({
+            'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
+            'task_words': task_words,
+            'words': words,
+        })
+        return super().get(request, *args, **kwargs)
 
 
 class TaskType_6_UpdateView(UpdateView):
@@ -353,12 +449,6 @@ class TaskType_23_UpdateView(UpdateView):
     template_name = 'structure/tasks/23_grammar_choose_from_video.html'
 
 
-
-
-
-
-
-
 class WordListView(ListView):
     model = Word
     extra_context = {'title': 'Word list'}
@@ -383,9 +473,9 @@ class WordUpdateView(UpdateView):
 
     def form_valid(self, form):
         self.object = form.save()
-        if form.data.get('audio_url') and not form.data.get('audio'):
+        if form.data.get('audio_url') and not form.files.get('audio'):
             self.object.save_audio_with_url(form.data.get('audio_url'))
-        if self.request.POST.get('image_url') and not self.request.POST.get('image'):
+        if form.data.get('image_url') and not form.files.get('image'):
             self.object.save_image_with_url(form.data.get('image_url'))
         self.success_url = reverse_lazy('adminpanel:word_update', kwargs={'pk': self.object.pk})
         return super().form_valid(form)
@@ -416,12 +506,12 @@ class GrammarCreateView(CreateView):
     def get(self, request, *args, **kwargs):
         self.object = Grammar.objects.create(
             name='name',
-            explanation = 'explanation',
-            char = 'char',
-            pinyin = 'pinyin',
-            lang = 'lang',
-            lit = 'lit',
-            structure = 'structure',
+            explanation='explanation',
+            char='char',
+            pinyin='pinyin',
+            lang='lang',
+            lit='lit',
+            structure='structure',
         )
         return HttpResponseRedirect(reverse_lazy('adminpanel:grammar_update', kwargs={'pk': self.object.pk}))
 
@@ -451,5 +541,3 @@ class GrammarUpdateView(UpdateView):
 class GrammarDeleteView(BaseDeleteView):
     model = Grammar
     success_url = reverse_lazy('adminpanel:grammar_list')
-
-

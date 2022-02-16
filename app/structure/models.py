@@ -1,9 +1,13 @@
+import mimetypes
 import os
 from uuid import uuid4
 
-from django.db import models
-from django.core.validators import FileExtensionValidator
+import requests
 from django.contrib.postgres.fields import ArrayField
+from django.core.files import File
+from django.core.files.temp import NamedTemporaryFile
+from django.core.validators import FileExtensionValidator
+from django.db import models
 from django.utils.deconstruct import deconstructible
 
 from elements.models import Word, Grammar, Character
@@ -160,7 +164,23 @@ class Task(models.Model):
 
     media = models.JSONField(default=default_task_media, null=True)
 
-    video = models.FileField(upload_to='media/video', null=True)
+    video = models.FileField(upload_to=PathAndRename('video/tasks/'),
+                             null=True, blank=True,
+                             validators=[FileExtensionValidator(['mp4'])])
 
     def __str__(self):
         return f'{self.task_type}_{self.get_task_type_display()}_id_{self.pk}'
+
+    def save_video_with_url(self, url):
+        resp = requests.get(url)
+        ext = mimetypes.guess_extension(resp.headers['content-type'])
+
+        temp_file = NamedTemporaryFile(delete=True)
+        temp_file.write(resp.content)
+        temp_file.flush()
+
+        self.video.save(name=f'{ext}', content=File(temp_file), save=True)
+
+    def save_video_with_file(self, file):
+        ext = file.name.split('.')[-1]
+        self.video.save(name=f'{ext}', content=File(file), save=True)

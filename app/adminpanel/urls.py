@@ -10,6 +10,7 @@ from adminpanel.views import (index,
                               LessonCreateView, LessonUpdateView, LessonDeleteView,
 
                               TaskUpdateView,
+                              task_update_with_ajax,
                               TaskType_1_UpdateView,
                               TaskType_2_UpdateView,
                               TaskType_3_UpdateView,
@@ -69,6 +70,8 @@ urlpatterns = [
     path('structure/lessons/delete/<int:pk>/', LessonDeleteView.as_view(), name='lesson_delete'),
 
     path('structure/tasks/update/<int:pk>/', TaskUpdateView.as_view(), name='task_update'),
+    path('structure/tasks/update_with_ajax/<int:pk>/', task_update_with_ajax, name='task_update_with_ajax'),
+
     path('structure/tasks/type_1/update/<int:pk>/', TaskType_1_UpdateView.as_view(), name='task_type_1_update'),
     path('structure/tasks/type_2/update/<int:pk>/', TaskType_2_UpdateView.as_view(), name='task_type_2_update'),
     path('structure/tasks/type_3/update/<int:pk>/', TaskType_3_UpdateView.as_view(), name='task_type_3_update'),
@@ -93,4 +96,6 @@ urlpatterns = [
     path('structure/tasks/type_22/update/<int:pk>/', TaskType_22_UpdateView.as_view(), name='task_type_22_update'),
     path('structure/tasks/type_23/update/<int:pk>/', TaskType_23_UpdateView.as_view(), name='task_type_23_update'),
     path('structure/tasks/delete/<int:pk>/', TaskDeleteView.as_view(), name='task_delete'),
+
+
 ]

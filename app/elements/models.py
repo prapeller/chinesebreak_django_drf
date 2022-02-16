@@ -1,13 +1,12 @@
 import mimetypes
 import os
 from uuid import uuid4
-from io import BytesIO
-import requests
 
-from django.db import models
-from django.core.validators import FileExtensionValidator
+import requests
 from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
+from django.core.validators import FileExtensionValidator
+from django.db import models
 from django.utils.deconstruct import deconstructible
 
 
@@ -65,7 +64,7 @@ class Word(models.Model):
                              null=True, blank=True,
                              validators=[FileExtensionValidator(['mp3', 'mp4', 'wav'])])
 
-    video = models.FileField(upload_to=PathAndRename('audio/video/'),
+    video = models.FileField(upload_to=PathAndRename('video/words'),
                              null=True, blank=True,
                              validators=[FileExtensionValidator(['mp4'])])
 

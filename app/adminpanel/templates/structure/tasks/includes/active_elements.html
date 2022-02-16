@@ -1,0 +1,12 @@
+<div class="active-elements">
+    {% for word_idx, task_word, is_active in task_words %}
+        {% if is_active %}
+            <div class="task-word-box active-word">
+                <div>
+                    <div class="cb_pinyin">{{ task_word.pinyin }}</div>
+                    <div class="cb_char">{{ task_word.char }}</div>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>

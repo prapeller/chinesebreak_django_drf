@@ -39,6 +39,16 @@ class SelectTaskTypeForm(forms.Form):
     task_type = forms.CharField(widget=forms.Select(choices=Task.TASK_TYPES, attrs={'class': 'form-select'}))
 
 
+class TaskVideoForm(forms.ModelForm):
+    video = forms.FileField(label='video', widget=forms.FileInput(attrs={'class': 'form-control'}), required=False)
+    video_url = forms.URLField(label='video_url', widget=forms.URLInput(attrs={'class': 'form-control'}),
+                               required=False)
+
+    class Meta:
+        model = Task
+        fields = ('video',)
+
+
 class WordForm(forms.ModelForm):
     pinyin = forms.CharField(label='pinyin', widget=forms.TextInput(attrs={'class': 'form-control'}), required=False)
     char = forms.CharField(label='char', widget=forms.TextInput(attrs={'class': 'form-control'}), required=False)
