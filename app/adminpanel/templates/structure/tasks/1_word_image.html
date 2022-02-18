@@ -26,6 +26,11 @@
 
     <p class="display-6">search_elements:</p>
 
+    <form class="d-flex nav-item my-lg-0" method="GET">
+        <input class="form-control me-2" type="search" placeholder="Search" name="search_key">
+        <button class="btn btn-outline-success" type="submit">Search</button>
+    </form>
+
     <div class="search_elems">
         <div class="search_words">
             {% for word in words %}

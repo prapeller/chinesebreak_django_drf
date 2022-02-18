@@ -62,7 +62,7 @@ class Word(models.Model):
 
     audio = models.FileField(upload_to=PathAndRename('audio/words/'),
                              null=True, blank=True,
-                             validators=[FileExtensionValidator(['mp3', 'mp4', 'wav'])])
+                             validators=[FileExtensionValidator(['mp3', 'wav'])])
 
     video = models.FileField(upload_to=PathAndRename('video/words'),
                              null=True, blank=True,

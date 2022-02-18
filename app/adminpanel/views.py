@@ -6,7 +6,7 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.views.generic.edit import BaseDeleteView
 
-from adminpanel.forms import WordForm, GrammarForm, TopicForm, SelectTaskTypeForm, CourseForm, LangForm, TaskVideoForm
+from adminpanel.forms import WordForm, GrammarForm, TopicForm, SelectTaskTypeForm, CourseForm, LangForm, TaskVideoForm, TaskImagesForm
 from elements.models import Word, Grammar
 from structure.models import Lang, Course, Topic, Lesson, Task
 
@@ -315,11 +315,13 @@ class TaskType_4_UpdateView(UpdateView):
         return super().get(request, *args, **kwargs)
 
     def form_valid(self, form):
-        if form.files.get('video'):
-            self.object.save_video_with_file(form.files.get('video'))
-        if form.data.get('video_url') and not form.files.get('video'):
-            self.object.save_video_with_url(form.data.get('video_url'))
-        self.success_url = reverse_lazy('adminpanel:task_type_4_update', kwargs={'pk': self.object.pk})
+        file = form.files.get('video')
+        url = form.data.get('video_url')
+        if file:
+            self.object.save_video_with_file(file)
+        if url and not file:
+            self.object.save_video_with_url(url)
+        self.success_url = reverse_lazy(f'adminpanel:task_type_{self.object.task_type}_update', kwargs={'pk': self.object.pk})
         return super().form_valid(form)
 
 
@@ -343,8 +345,32 @@ class TaskType_5_UpdateView(UpdateView):
 
 class TaskType_6_UpdateView(UpdateView):
     model = Task
-    fields = '__all__'
-    template_name = 'structure/tasks/6_sent_image.html'
+    fields = ()
+    extra_context = {}
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.template_name = f'structure/tasks/{self.object.task_type}_{self.object.get_task_type_display()}.html'
+        task_words = [(idx, Word.objects.get(id=word[0]), word[1]) for idx, word in enumerate(self.object.words)]
+        words = Word.objects.all()
+        self.extra_context.update({
+            'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
+            'sent_images': self.object.sent_images,
+            'task_images_form': TaskImagesForm(),
+            'task_words': task_words,
+            'words': words,
+        })
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        file = form.files.get('image')
+        url = form.data.get('image_url')
+        if file:
+            self.object.save_task_image_with_file(file)
+        if url and not file:
+            self.object.save_task_image_with_url(url)
+        self.success_url = reverse_lazy(f'adminpanel:task_type_{self.object.task_type}_update', kwargs={'pk': self.object.pk})
+        return super().form_valid(form)
 
 
 class TaskType_7_UpdateView(UpdateView):

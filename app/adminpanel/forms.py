@@ -41,8 +41,7 @@ class SelectTaskTypeForm(forms.Form):
 
 class TaskVideoForm(forms.ModelForm):
     video = forms.FileField(label='video', widget=forms.FileInput(attrs={'class': 'form-control'}), required=False)
-    video_url = forms.URLField(label='video_url', widget=forms.URLInput(attrs={'class': 'form-control'}),
-                               required=False)
+    video_url = forms.URLField(label='video_url', widget=forms.URLInput(attrs={'class': 'form-control'}), required=False)
 
     class Meta:
         model = Task
@@ -56,16 +55,13 @@ class WordForm(forms.ModelForm):
     lit = forms.CharField(label='lit', widget=forms.TextInput(attrs={'class': 'form-control'}), required=False)
 
     image = forms.FileField(label='image', widget=forms.FileInput(attrs={'class': 'form-control'}), required=False)
-    image_url = forms.URLField(label='image_url', widget=forms.URLInput(attrs={'class': 'form-control'}),
-                               required=False)
+    image_url = forms.URLField(label='image_url', widget=forms.URLInput(attrs={'class': 'form-control'}), required=False)
 
     audio = forms.FileField(label='audio', widget=forms.FileInput(attrs={'class': 'form-control'}), required=False)
-    audio_url = forms.URLField(label='audio_url', widget=forms.URLInput(attrs={'class': 'form-control'}),
-                               required=False)
+    audio_url = forms.URLField(label='audio_url', widget=forms.URLInput(attrs={'class': 'form-control'}), required=False)
 
     video = forms.FileField(label='video', widget=forms.FileInput(attrs={'class': 'form-control'}), required=False)
-    video_url = forms.URLField(label='video_url', widget=forms.URLInput(attrs={'class': 'form-control'}),
-                               required=False)
+    video_url = forms.URLField(label='video_url', widget=forms.URLInput(attrs={'class': 'form-control'}), required=False)
 
     class Meta:
         model = Word
@@ -86,3 +82,12 @@ class GrammarForm(forms.ModelForm):
     class Meta:
         model = Grammar
         fields = '__all__'
+
+
+class TaskImagesForm(forms.ModelForm):
+    image = forms.FileField(label='image', widget=forms.FileInput(attrs={'class': 'form-control'}), required=False)
+    image_url = forms.URLField(label='image_url', widget=forms.URLInput(attrs={'class': 'form-control'}), required=False)
+
+    class Meta:
+        model = Task
+        fields = ('image', 'image_url')

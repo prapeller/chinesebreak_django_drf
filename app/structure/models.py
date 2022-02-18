@@ -5,6 +5,8 @@ from uuid import uuid4
 import requests
 from django.contrib.postgres.fields import ArrayField
 from django.core.files import File
+from django.conf import settings
+from django.core.files.storage import default_storage
 from django.core.files.temp import NamedTemporaryFile
 from django.core.validators import FileExtensionValidator
 from django.db import models
@@ -27,7 +29,6 @@ class PathAndRename(object):
         else:
             filename = '{}.{}'.format(uuid4().hex, ext)
         return os.path.join(self.sub_path, filename)
-
 
 
 class Lang(models.Model):
@@ -85,8 +86,9 @@ def default_task_media():
 def default_1d_array():
     return []
 
+
 def default_2d_array():
-    return [[],]
+    return [[], ]
 
 
 class Task(models.Model):
@@ -143,26 +145,33 @@ class Task(models.Model):
     character = models.ForeignKey(Character, on_delete=models.CASCADE, null=True)
 
     # right_sentences
-    # предлоежние на китайском
+    # sent_char, sent_pinyin, sent_lang, sent_lit, sent_audio - предлоежния (_A - первые реплики, _B - вторые)
     sent_char_A = models.CharField(max_length=120, null=True)
-    # предложение на pinyin
     sent_pinyin_A = models.CharField(max_length=120, null=True)
-    # 'или предложение на русском(которое используется для выбора среди правильных / неправильных или это список элементов пазла которые используются для выбора среди правильных/неправильных элементов пазла и потом будут отображаться во всплывающем окне правильного ответа. Например sent_lang_A": [{"я": 1}, {"-": 0}, {"Чжан Вэй": 1}, {".": 0}] будет означать, что пользователь будет собирать предложение из пазлов "я" и "Чжан Вэй" и еще других неправильных, а во всплывающем окне правильного ответа будет отображаться польностью "Я - Чжан Вэй."
     sent_lang_A = models.CharField(max_length=120, null=True)
-    # предолжение на русском дословно
     sent_lit_A = models.CharField(max_length=120, null=True)
-    # все то же самое, используются в случае если задания с диалогами (это вторые реплики)')
+    sent_audio_A = models.FileField(upload_to=PathAndRename('audio/tasks/'),
+                                    null=True, blank=True,
+                                    validators=[FileExtensionValidator(['mp3', 'wav'])])
+
     sent_char_B = models.CharField(max_length=120, null=True)
     sent_pinyin_B = models.CharField(max_length=120, null=True)
     sent_lang_B = models.CharField(max_length=120, null=True)
     sent_lit_B = models.CharField(max_length=120, null=True)
+    sent_audio_B = models.FileField(upload_to=PathAndRename('audio/tasks/'),
+                                    null=True, blank=True,
+                                    validators=[FileExtensionValidator(['mp3', 'wav'])])
 
-    # 'смысл как в right_sentences, только это списки с неправильными вариантами предложений
+    # 'смысл как в right_sentences, только это списки с неправильными вариантами предложений (без lit/audio, тк неправильные нигде не выводятся и не проигрываются)
     sent_char_W = ArrayField(models.CharField(max_length=120), null=True, default=default_1d_array)
     sent_pinyin_W = ArrayField(models.CharField(max_length=120), null=True, default=default_1d_array)
     sent_lang_W = ArrayField(models.CharField(max_length=120), null=True, default=default_1d_array)
 
-    media = models.JSONField(default=default_task_media, null=True)
+    # варианты картинок для предложений (первое правильное)
+    sent_images = ArrayField(models.FileField(upload_to=PathAndRename('images/tasks/'),
+                                              validators=[FileExtensionValidator(['svg', 'jpg', 'jpeg', 'png'])]),
+                             null=True, blank=True, default=default_1d_array
+                             )
 
     video = models.FileField(upload_to=PathAndRename('video/tasks/'),
                              null=True, blank=True,
@@ -184,3 +193,21 @@ class Task(models.Model):
     def save_video_with_file(self, file):
         ext = file.name.split('.')[-1]
         self.video.save(name=f'{ext}', content=File(file), save=True)
+
+    def save_task_image_with_file(self, file):
+        path = default_storage.save(settings.BASE_DIR / f'static/media/images/tasks/{file.name}', file.file)
+        self.sent_images.append(f'/media/{path}')
+        self.save()
+
+    def save_task_image_with_url(self, url):
+        resp = requests.get(url)
+        ext = mimetypes.guess_extension(resp.headers['content-type'])
+
+        temp_file = NamedTemporaryFile(delete=True)
+        temp_file.write(resp.content)
+        temp_file.flush()
+        file = File(temp_file)
+
+        path = default_storage.save(settings.BASE_DIR / f'static/media/images/tasks/{file.name.replace("/tmp/", "")}{ext}', file.file)
+        self.sent_images.append(f'/media/{path}')
+        self.save()

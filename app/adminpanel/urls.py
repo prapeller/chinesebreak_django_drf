@@ -96,6 +96,4 @@ urlpatterns = [
     path('structure/tasks/type_22/update/<int:pk>/', TaskType_22_UpdateView.as_view(), name='task_type_22_update'),
     path('structure/tasks/type_23/update/<int:pk>/', TaskType_23_UpdateView.as_view(), name='task_type_23_update'),
     path('structure/tasks/delete/<int:pk>/', TaskDeleteView.as_view(), name='task_delete'),
-
-
 ]
