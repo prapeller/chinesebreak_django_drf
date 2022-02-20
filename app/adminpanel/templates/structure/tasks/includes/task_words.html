@@ -1,5 +1,5 @@
 <div class="task-words">
-    {% for word_idx, word, is_active, is_grammared in task_words %}
+    {% for word_idx, word, is_active, is_grammared, is_for_display, is_to_delete in task_words %}
         {% if is_active %}
             <div class="task-word" data-word_idx="{{ word_idx }}" data-task_pk="{{ object.pk }}">
                 <div class="task-word-box active-word">
@@ -21,6 +21,15 @@
                         <input href="" type="checkbox" class="form-check-input grammar-checkbox">
                     </div>
                 {% endif %}
+                {% if is_for_display %}
+                    <div class="under-word-btn-box form-switch">
+                        <input href="" type="checkbox" class="form-check-input display-word-checkbox" checked>
+                    </div>
+                {% else %}
+                    <div class="under-word-btn-box form-switch">
+                        <input href="" type="checkbox" class="form-check-input display-word-checkbox">
+                    </div>
+                {% endif %}
             </div>
 
         {% else %}
@@ -37,11 +46,20 @@
                 </div>
                 {% if is_grammared %}
                     <div class="under-word-btn-box form-switch">
-                        <input href="" type="checkbox" class="form-check-input active-grammar-box" checked>
+                        <input href="" type="checkbox" class="form-check-input grammar-checkbox" checked>
                     </div>
                 {% else %}
                     <div class="under-word-btn-box form-switch">
-                        <input href="" type="checkbox" class="form-check-input active-grammar-box">
+                        <input href="" type="checkbox" class="form-check-input grammar-checkbox">
+                    </div>
+                {% endif %}
+                {% if is_for_display %}
+                    <div class="under-word-btn-box form-switch">
+                        <input href="" type="checkbox" class="form-check-input display-word-checkbox" checked>
+                    </div>
+                {% else %}
+                    <div class="under-word-btn-box form-switch">
+                        <input href="" type="checkbox" class="form-check-input display-word-checkbox">
                     </div>
                 {% endif %}
             </div>

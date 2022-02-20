@@ -165,10 +165,8 @@ class Task(models.Model):
                                     null=True, blank=True,
                                     validators=[FileExtensionValidator(['mp3', 'wav'])])
 
-    # 'смысл как в right_sentences, только это списки с неправильными вариантами предложений (без lit/audio, тк неправильные нигде не выводятся и не проигрываются)
-    sent_char_W = ArrayField(models.CharField(max_length=120), null=True, default=default_1d_array)
-    sent_pinyin_W = ArrayField(models.CharField(max_length=120), null=True, default=default_1d_array)
-    sent_lang_W = ArrayField(models.CharField(max_length=120), null=True, default=default_1d_array)
+    # [[sent_wrong_pinyin, ...], [sent_wrong_char, ...], [sent_wrong_lang, ...]]
+    sent_wrong = ArrayField(ArrayField(models.CharField(max_length=120, null=True, blank=True)), null=True, default=default_2d_array)
 
     # варианты картинок для предложений (первое правильное)
     sent_images = ArrayField(models.FileField(upload_to=PathAndRename('images/tasks/'),

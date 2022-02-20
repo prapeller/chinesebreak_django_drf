@@ -238,7 +238,7 @@ def task_update_with_ajax(request, pk):
 
     if add_word_id:
         word_id = int(add_word_id)
-        task.words.append([word_id, 0, 0])
+        task.words.append([word_id, 0, 0, 0, 0])
         task.save()
 
     if add_grammar_id:
@@ -252,7 +252,8 @@ def task_update_with_ajax(request, pk):
         task.save()
 
     context = {'object': Task.objects.get(pk=pk),
-               'task_words': [(idx, Word.objects.get(id=word[0]), word[1], word[2]) for idx, word in enumerate(task.words)],
+               'task_words': [(idx, Word.objects.get(id=word[0]), word[1], word[2], word[3], word[4]) for idx, word in
+                              enumerate(task.words)],
                'task_grammar': task.grammar,
                'sent_images': task.sent_images,
                }
@@ -276,7 +277,8 @@ class TaskType_1_UpdateView(UpdateView):
         self.template_name = f'structure/tasks/{self.object.task_type}_{self.object.get_task_type_display()}.html'
         self.extra_context.update({
             'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
-            'task_words': [(idx, Word.objects.get(id=word[0]), word[1], word[2]) for idx, word in enumerate(self.object.words)],
+            'task_words': [(idx, Word.objects.get(id=word[0]), word[1], word[2], word[3], word[4]) for idx, word in
+                           enumerate(self.object.words)],
             'words': Word.objects.all(),
         })
         return super().get(request, *args, **kwargs)
@@ -292,7 +294,8 @@ class TaskType_2_UpdateView(UpdateView):
         self.template_name = f'structure/tasks/{self.object.task_type}_{self.object.get_task_type_display()}.html'
         self.extra_context.update({
             'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
-            'task_words': [(idx, Word.objects.get(id=word[0]), word[1], word[2]) for idx, word in enumerate(self.object.words)],
+            'task_words': [(idx, Word.objects.get(id=word[0]), word[1], word[2], word[3], word[4]) for idx, word in
+                           enumerate(self.object.words)],
             'words': Word.objects.all(),
         })
         return super().get(request, *args, **kwargs)
@@ -308,7 +311,8 @@ class TaskType_3_UpdateView(UpdateView):
         self.template_name = f'structure/tasks/{self.object.task_type}_{self.object.get_task_type_display()}.html'
         self.extra_context.update({
             'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
-            'task_words': [(idx, Word.objects.get(id=word[0]), word[1], word[2]) for idx, word in enumerate(self.object.words)],
+            'task_words': [(idx, Word.objects.get(id=word[0]), word[1], word[2], word[3], word[4]) for idx, word in
+                           enumerate(self.object.words)],
             'words': Word.objects.all(),
         })
         return super().get(request, *args, **kwargs)
@@ -324,20 +328,19 @@ class TaskType_4_UpdateView(UpdateView):
         self.template_name = f'structure/tasks/{self.object.task_type}_{self.object.get_task_type_display()}.html'
         self.success_url = reverse_lazy('adminpanel:task_type_4_update', kwargs={'pk': self.object.pk})
         self.extra_context.update({
-            'video_form': TaskForm(instance=self.object),
+            'form': TaskForm(instance=self.object),
             'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
-            'task_words': [(idx, Word.objects.get(id=word[0]), word[1], word[2]) for idx, word in enumerate(self.object.words)],
+            'task_words': [(idx, Word.objects.get(id=word[0]), word[1], word[2], word[3], word[4]) for idx, word in
+                           enumerate(self.object.words)],
             'words': Word.objects.all(),
         })
         return super().get(request, *args, **kwargs)
 
     def form_valid(self, form):
-        file = form.files.get('video')
-        url = form.data.get('video_url')
-        if file:
-            self.object.save_video_with_file(file)
-        if url and not file:
-            self.object.save_video_with_url(url)
+        self.object.save_task_video(
+            video_file=form.files.get('video'),
+            video_url=form.data.get('video_url')
+        )
         self.success_url = reverse_lazy(f'adminpanel:task_type_{self.object.task_type}_update', kwargs={'pk': self.object.pk})
         return super().form_valid(form)
 
@@ -352,7 +355,8 @@ class TaskType_5_UpdateView(UpdateView):
         self.template_name = f'structure/tasks/{self.object.task_type}_{self.object.get_task_type_display()}.html'
         self.extra_context.update({
             'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
-            'task_words': [(idx, Word.objects.get(id=word[0]), word[1], word[2]) for idx, word in enumerate(self.object.words)],
+            'task_words': [(idx, Word.objects.get(id=word[0]), word[1], word[2], word[3], word[4]) for idx, word in
+                           enumerate(self.object.words)],
             'words': Word.objects.all(),
         })
         return super().get(request, *args, **kwargs)
@@ -371,7 +375,8 @@ class TaskType_6_UpdateView(UpdateView):
             'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
             'form': TaskForm(instance=self.object),
             'sent_images': self.object.sent_images,
-            'task_words': [(idx, Word.objects.get(id=word[0]), word[1], word[2]) for idx, word in enumerate(self.object.words)],
+            'task_words': [(idx, Word.objects.get(id=word[0]), word[1], word[2], word[3], word[4]) for idx, word in
+                           enumerate(self.object.words)],
             'task_grammar': self.object.grammar,
             'words': Word.objects.all(),
             'grammars': Grammar.objects.all(),
@@ -400,8 +405,43 @@ class TaskType_6_UpdateView(UpdateView):
 
 class TaskType_7_UpdateView(UpdateView):
     model = Task
-    fields = '__all__'
-    template_name = 'structure/tasks/7_sent_char_from_lang.html'
+    fields = ()
+    extra_context = {}
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.template_name = f'structure/tasks/{self.object.task_type}_{self.object.get_task_type_display()}.html'
+
+        self.extra_context.update({
+            'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
+            'form': TaskForm(instance=self.object),
+            # 'sent_wrong_list': self.object.sent_wrong
+            'task_words': [(idx, Word.objects.get(id=word[0]), word[1], word[2], word[3], word[4]) for idx, word in
+                           enumerate(self.object.words)],
+            'task_grammar': self.object.grammar,
+            'words': Word.objects.all(),
+            'grammars': Grammar.objects.all(),
+        })
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        self.object.save_task_sent(
+            sent_lang_A=form.data.get('sent_lang_A'),
+            sent_lit_A=form.data.get('sent_lit_A')
+        )
+
+        self.object.save_task_image(
+            image_file=form.files.get('image'),
+            image_url=form.data.get('image_url')
+        )
+
+        self.object.save_task_audio(
+            sent_audio_A_file=form.files.get('sent_audio_A'),
+            sent_audio_A_url=form.data.get('sent_audio_A_url')
+        )
+
+        self.success_url = reverse_lazy(f'adminpanel:task_type_{self.object.task_type}_update', kwargs={'pk': self.object.pk})
+        return super().form_valid(form)
 
 
 class TaskType_8_UpdateView(UpdateView):

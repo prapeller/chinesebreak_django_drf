@@ -29,12 +29,8 @@
                 <video class="video" src="" controls></video>
             {% endif %}
 
-            {% for foo in video_form %}
-                {{ foo }}
-            {% endfor %}
-
-            {#            {{ video_form.video }}#}
-            {#            {{ video_form.video_url }}#}
+            {{ form.video }}
+            {{ form.video_url }}
 
             <div class="d-grid">
                 <input type="submit" class="btn btn_ok mt-2 mb-2" value=""></input>
