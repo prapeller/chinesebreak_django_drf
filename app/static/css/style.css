@@ -159,17 +159,22 @@
 .active-word {
     border: 4px solid #929CFF;
 }
-
 .active-grammar {
     border: 4px solid #ffebb6;
 }
 
 .inactive-word {
     position: relative;
-    border: 4px solid #FF819C;
+    border: 4px solid rgba(189, 189, 189, 0.42);
 }
 
 .inactive-grammar {
+    border: 4px solid #bdbdbd;
+}
+.right-sent-image {
+    border: 4px solid #929CFF;
+}
+.wrong-sent-image {
     border: 4px solid #FF819C;
 }
 

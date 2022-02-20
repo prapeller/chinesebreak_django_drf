@@ -1,12 +1,20 @@
 <div class="active-elements">
-    {% for word_idx, task_word, is_active in task_words %}
+    {% for word_idx, word, is_active, is_grammared in task_words %}
         {% if is_active %}
             <div class="task-word-box active-word">
                 <div>
-                    <div class="cb_pinyin">{{ task_word.pinyin }}</div>
-                    <div class="cb_char">{{ task_word.char }}</div>
+                    <div class="cb_pinyin">{{ word.pinyin }}</div>
+                    <div class="cb_char">{{ word.char }}</div>
                 </div>
             </div>
         {% endif %}
     {% endfor %}
+        {% if task_grammar %}
+            <div class="task-grammar-box active-grammar">
+                <div>
+                    <div class="cb_pinyin">{{ task_grammar.pinyin }}</div>
+                    <div class="cb_char">{{ task_grammar.name }}</div>
+                </div>
+            </div>
+        {% endif %}
 </div>

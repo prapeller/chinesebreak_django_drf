@@ -1,5 +1,5 @@
 <div class="task-words">
-    {% for word_idx, word, is_active in task_words %}
+    {% for word_idx, word, is_active, is_grammared in task_words %}
         {% if is_active %}
             <div class="task-word" data-word_idx="{{ word_idx }}" data-task_pk="{{ object.pk }}">
                 <div class="task-word-box active-word">
@@ -12,6 +12,15 @@
                 <div class="under-word-btn-box form-switch">
                     <input href="" type="checkbox" class="form-check-input word-checkbox" checked>
                 </div>
+                {% if is_grammared %}
+                    <div class="under-word-btn-box form-switch">
+                        <input href="" type="checkbox" class="form-check-input grammar-checkbox" checked>
+                    </div>
+                {% else %}
+                    <div class="under-word-btn-box form-switch">
+                        <input href="" type="checkbox" class="form-check-input grammar-checkbox">
+                    </div>
+                {% endif %}
             </div>
 
         {% else %}
@@ -26,6 +35,15 @@
                 <div class="under-word-btn-box form-switch">
                     <input href="" type="checkbox" class="form-check-input word-checkbox">
                 </div>
+                {% if is_grammared %}
+                    <div class="under-word-btn-box form-switch">
+                        <input href="" type="checkbox" class="form-check-input active-grammar-box" checked>
+                    </div>
+                {% else %}
+                    <div class="under-word-btn-box form-switch">
+                        <input href="" type="checkbox" class="form-check-input active-grammar-box">
+                    </div>
+                {% endif %}
             </div>
         {% endif %}
     {% endfor %}

@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% load get_index %}
 
 {% block title %}
     {{ task_type.id }}_{{ task_type.name }}
@@ -17,77 +16,53 @@
         </div>
     </div>
 
-    <p class="display-6">sent_images:</p>
-
-    <div class=sent-images">
-        {% for sent_image in sent_images %}
-            {% if sent_images|get_index:sent_image == 0 %}
-                <div class="sent-image">
-                    <div class="image-box"><img class="image active-word" src="{{ sent_image }}" alt="ooops"></div>
-                    <div class="right-up-btn-box"><a href="">
-                        <button class="btn-close"></button>
-                    </a></div>
-                </div>
-            {% else %}
-                <div class="sent-image">
-                    <div class="image-box"><img class="image inactive-word" src="{{ sent_image }}" alt="ooops"></div>
-                    <div class="right-up-btn-box"><a href="">
-                        <button class="btn-close"></button>
-                    </a></div>
-                </div>
-            {% endif %}
-        {% endfor %}
-    </div>
-
     <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        {% for field in task_images_form %}
-            {{ field }}
-        {% endfor %}
-        <input type="submit" value="add">
-    </form>
+    {% csrf_token %}
 
-    <p class="display-6">task_words:</p>
+        {#   sent_images #}
+        <p class="display-6">sent_images:</p>
+        {% include 'structure/tasks/includes/sent_images.html' %}
+        {{ form.image }}
+        {{ form.image_url }}
 
-    {% include 'structure/tasks/includes/task_words.html' %}
+        {#   task_words #}
+        <p class="display-6">task_words:</p>
+        {% include 'structure/tasks/includes/task_words.html' %}
 
-    {# sent form #}
-    <form method="POST">
-        {% csrf_token %}
+        {# sent_lang_A #}
         <p class="display-6">sent_lang:</p>
+        {{ form.sent_lang_A }}
+
+        {# sent_lit_A #}
         <p class="display-6">sent_lit:</p>
-    </form>
+        {{ form.sent_lit_A }}
 
-    {# audio #}
-    <audio controls class="mb_10 ml_mr_auto br_20 shadow_light">
-        {#		<source src="{{ url_for('static', filename='audio/' + sent_A_audio_name) }}">#}
-    </audio>
+        {# sent_audio_A #}
+        <p class="display-6">sent_audio:</p>
 
-    <form method="POST" enctype="multipart/form-data">
-        {#		{{ sent_A_audio_form.hidden_tag() }}#}
-        {#		{{ sent_A_audio_form.sent_A_audio(class="form-control") }}#}
-        {#		{{ sent_A_audio_form.upload_sent_A_audio }}#}
+        <div class="mt-5">
+            {% if object.sent_audio_A %}
+                <audio controls class="br_20 shadow_light">
+                    <source src="{{ object.sent_audio_A.url }}">
+                </audio>
+            {% else %}
+                <audio controls class="br_20 shadow_light">
+                </audio>
+            {% endif %}
+        </div>
+        {{ form.sent_audio_A }}
+        {{ form.sent_audio_A_url }}
+
+        <!-- submit btn -->
+        <div class="d-grid">
+            <input type="submit" class="btn btn_ok mt-2 mb-2" value=""></input>
+        </div>
     </form>
 
     <p class="display-6">active_elements:</p>
 
     {% include 'structure/tasks/includes/active_elements.html' %}
 
-    {% for grammar in active_task_grammars %}
-        {% if grammar.id in task_grammars_id_list %}
-            <div class="task-grammar-box active-grammar">
-                <div>
-                    <div class="cb_pinyin">{{ grammar.pinyin }}</div>
-                    <div class="cb_name">{{ grammar.name }}</div>
-                </div>
-            </div>
-        {% endif %}
-    {% endfor %}
-    </div>
-
-    {#    {% if task.elements.get('grammar_id') and task.elements.get('grammar_id')[word_ind] != 0 %}#}
-    {#        {{ task_grammars[word_ind] }}#}
-    {#    {% endif %}#}
 
     <p class="display-6">search_elements:</p>
 
@@ -98,16 +73,29 @@
 
     <div class="search_elems">
         <div class="search_grammars">
+            {% for grammar in grammars %}
+                <div class="list-group" data-task_pk="{{ object.pk }}">
+                    <a href="" class="list-group-item list-group-item-action"
+                       data-grammar_id="{{ grammar.pk }}">{{ grammar }}</a>
+                </div>
+            {% endfor %}
         </div>
 
         <div class="search_words">
             {% for word in words %}
                 <div class="list-group" data-task_pk="{{ object.pk }}">
-                    <a href="" class="list-group-item list-group-item-action word-to-add"
+                    <a href="" class="list-group-item list-group-item-action"
                        data-word_id="{{ word.pk }}">{{ word }}</a>
                 </div>
             {% endfor %}
         </div>
     </div>
+
+    <script src="{{ STATIC_PREFIX }}js/activate_word.js" defer></script>
+    <script src="{{ STATIC_PREFIX }}js/activate_grammar.js" defer></script>
+    <script src="{{ STATIC_PREFIX }}js/remove_element.js" defer></script>
+    <script src="{{ STATIC_PREFIX }}js/add_element.js" defer></script>
+    <script src="{{ STATIC_PREFIX }}js/remove_sent_image.js" defer></script>
+
 
 {% endblock %}

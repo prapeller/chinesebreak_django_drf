@@ -83,6 +83,7 @@ def default_task_media():
         "sent_audio_B_id": []
     }
 
+
 def default_1d_array():
     return []
 
@@ -150,6 +151,7 @@ class Task(models.Model):
     sent_pinyin_A = models.CharField(max_length=120, null=True)
     sent_lang_A = models.CharField(max_length=120, null=True)
     sent_lit_A = models.CharField(max_length=120, null=True)
+
     sent_audio_A = models.FileField(upload_to=PathAndRename('audio/tasks/'),
                                     null=True, blank=True,
                                     validators=[FileExtensionValidator(['mp3', 'wav'])])
@@ -158,6 +160,7 @@ class Task(models.Model):
     sent_pinyin_B = models.CharField(max_length=120, null=True)
     sent_lang_B = models.CharField(max_length=120, null=True)
     sent_lit_B = models.CharField(max_length=120, null=True)
+
     sent_audio_B = models.FileField(upload_to=PathAndRename('audio/tasks/'),
                                     null=True, blank=True,
                                     validators=[FileExtensionValidator(['mp3', 'wav'])])
@@ -180,34 +183,91 @@ class Task(models.Model):
     def __str__(self):
         return f'{self.task_type}_{self.get_task_type_display()}_id_{self.pk}'
 
-    def save_video_with_url(self, url):
-        resp = requests.get(url)
-        ext = mimetypes.guess_extension(resp.headers['content-type'])
-
-        temp_file = NamedTemporaryFile(delete=True)
-        temp_file.write(resp.content)
-        temp_file.flush()
-
-        self.video.save(name=f'{ext}', content=File(temp_file), save=True)
-
-    def save_video_with_file(self, file):
-        ext = file.name.split('.')[-1]
-        self.video.save(name=f'{ext}', content=File(file), save=True)
-
-    def save_task_image_with_file(self, file):
-        path = default_storage.save(settings.BASE_DIR / f'static/media/images/tasks/{file.name}', file.file)
-        self.sent_images.append(f'/media/{path}')
+    def save_task_sent(self,
+                       sent_char_A=None,
+                       sent_pinyin_A=None,
+                       sent_lang_A=None,
+                       sent_lit_A=None,
+                       sent_char_B=None,
+                       sent_pinyin_B=None,
+                       sent_lang_B=None,
+                       sent_lit_B=None):
+        self.sent_char_A = sent_char_A
+        self.sent_pinyin_A = sent_pinyin_A
+        self.sent_lit_A = sent_lit_A
+        self.sent_lang_A = sent_lang_A
+        self.sent_char_B = sent_char_B
+        self.sent_pinyin_B = sent_pinyin_B
+        self.sent_lang_B = sent_lang_B
+        self.sent_lit_B = sent_lit_B
         self.save()
 
-    def save_task_image_with_url(self, url):
-        resp = requests.get(url)
-        ext = mimetypes.guess_extension(resp.headers['content-type'])
+    def save_task_video(self,
+                        video_file=None,
+                        video_url=None):
+        if video_file:
+            ext = video_file.name.split('.')[-1]
+            self.video.save(name=f'{ext}', content=File(video_file), save=True)
 
-        temp_file = NamedTemporaryFile(delete=True)
-        temp_file.write(resp.content)
-        temp_file.flush()
-        file = File(temp_file)
+        if video_url and not video_file:
+            resp = requests.get(video_url)
+            ext = mimetypes.guess_extension(resp.headers['content-type'])
 
-        path = default_storage.save(settings.BASE_DIR / f'static/media/images/tasks/{file.name.replace("/tmp/", "")}{ext}', file.file)
-        self.sent_images.append(f'/media/{path}')
-        self.save()
+            temp_file = NamedTemporaryFile(delete=True)
+            temp_file.write(resp.content)
+            temp_file.flush()
+
+            self.video.save(name=f'{ext}', content=File(temp_file), save=True)
+
+    def save_task_audio(self,
+                        sent_audio_A_file=None,
+                        sent_audio_A_url=None,
+                        sent_audio_B_file=None,
+                        sent_audio_B_url=None):
+        if sent_audio_A_file:
+            ext = sent_audio_A_file.name.split('.')[-1]
+            self.video.save(name=f'{ext}', content=File(sent_audio_A_file), save=True)
+
+        if sent_audio_A_url and not sent_audio_A_file:
+            resp = requests.get(sent_audio_A_url)
+            ext = mimetypes.guess_extension(resp.headers['content-type'])
+
+            temp_file = NamedTemporaryFile(delete=True)
+            temp_file.write(resp.content)
+            temp_file.flush()
+
+            self.sent_audio_A.save(name=f'{ext}', content=File(temp_file), save=True)
+
+        if sent_audio_B_file:
+            ext = sent_audio_B_file.name.split('.')[-1]
+            self.video.save(name=f'{ext}', content=File(sent_audio_B_file), save=True)
+
+        if sent_audio_B_url and not sent_audio_B_file:
+            resp = requests.get(sent_audio_B_url)
+            ext = mimetypes.guess_extension(resp.headers['content-type'])
+
+            temp_file = NamedTemporaryFile(delete=True)
+            temp_file.write(resp.content)
+            temp_file.flush()
+
+            self.sent_audio_B.save(name=f'{ext}', content=File(temp_file), save=True)
+
+    def save_task_image(self,
+                        image_file=None,
+                        image_url=None):
+        if image_file:
+            path = default_storage.save(settings.BASE_DIR / f'static/media/images/tasks/{image_file.name}', image_file.file)
+            self.sent_images.append(f'/media/{path}')
+
+        if image_url and not image_file:
+            resp = requests.get(image_url)
+            ext = mimetypes.guess_extension(resp.headers['content-type'])
+
+            temp_file = NamedTemporaryFile(delete=True)
+            temp_file.write(resp.content)
+            temp_file.flush()
+            file = File(temp_file)
+
+            path = default_storage.save(settings.BASE_DIR / f'static/media/images/tasks/{file.name.replace("/tmp/", "")}{ext}', file.file)
+            self.sent_images.append(f'/media/{path}')
+            self.save()
