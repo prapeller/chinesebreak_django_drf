@@ -165,7 +165,7 @@ class Task(models.Model):
                                     null=True, blank=True,
                                     validators=[FileExtensionValidator(['mp3', 'wav'])])
 
-    # [[sent_wrong_pinyin, ...], [sent_wrong_char, ...], [sent_wrong_lang, ...]]
+    # [[sent_wrong_pinyin, sent_wrong_char, sent_wrong_lang], [ ... ], ]
     sent_wrong = ArrayField(ArrayField(models.CharField(max_length=120, null=True, blank=True)), null=True, default=default_2d_array)
 
     # варианты картинок для предложений (первое правильное)
@@ -180,6 +180,21 @@ class Task(models.Model):
 
     def __str__(self):
         return f'{self.task_type}_{self.get_task_type_display()}_id_{self.pk}'
+
+    def add_sent_wrong(self, sent_wrong_pinyin, sent_wrong_char):
+        if sent_wrong_pinyin and sent_wrong_char:
+            self.sent_wrong.append([sent_wrong_pinyin, sent_wrong_char])
+            self.save()
+
+    def get_task_words(self):
+        return [(idx, Word.objects.get(id=word[0]), word[1], word[2], word[3], word[4]) for idx, word in
+                enumerate(self.words)]
+
+    def get_right_sent_from_task_words(self):
+        words_qs = [Word.objects.get(id=word[0]) for word in self.words]
+        pinyin_list = ' '.join([word.pinyin for word in words_qs]).rstrip()
+        char_list = ''.join([word.char for word in words_qs])
+        return (pinyin_list, char_list)
 
     def save_task_sent(self,
                        sent_char_A=None,

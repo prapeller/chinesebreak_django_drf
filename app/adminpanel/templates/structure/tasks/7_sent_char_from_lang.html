@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-	{{ task_type.id }}_{{ task_type.name }}
+    {{ task_type.id }}_{{ task_type.name }}
 {% endblock %}
 
 
@@ -17,20 +17,86 @@
         </div>
     </div>
 
-	<p class="display-6">task_sents / wrong_sents:</p>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
 
-	<p class="display-6">task_words:</p>
+        {#  task_sents  #}
+        <p class="display-6">task_sents:</p>
+        {% include 'structure/tasks/includes/task_sents.html' %}
+        {{ form.sent_wrong_pinyin }}
+        {{ form.sent_wrong_char }}
+        <input type="submit" class="btn btn_add" value=""></input>
 
-		<p class="display-6">sent_lang:</p>
+        {#   task_words #}
+        <p class="display-6">task_words:</p>
+        {% include 'structure/tasks/includes/task_words.html' %}
 
-		<p class="display-6">sent_lit:</p>
+        {# sent_lang_A #}
+        <p class="display-6">sent_lang:</p>
+        {{ form.sent_lang_A }}
+
+        {# sent_lit_A #}
+        <p class="display-6">sent_lit:</p>
+        {{ form.sent_lit_A }}
+
+        {# sent_audio_A #}
+        <p class="display-6">sent_audio:</p>
+
+        <div class="mt-5">
+            {% if object.sent_audio_A %}
+                <audio controls class="br_20 shadow_light">
+                    <source src="{{ object.sent_audio_A.url }}">
+                </audio>
+            {% else %}
+                <audio controls class="br_20 shadow_light">
+                </audio>
+            {% endif %}
+        </div>
+        {{ form.sent_audio_A }}
+        {{ form.sent_audio_A_url }}
+
+        <!-- submit btn -->
+        <div class="d-grid">
+            <input type="submit" class="btn btn_ok mt-2 mb-2" value=""></input>
+        </div>
+    </form>
+
+    <p class="display-6">active_elements:</p>
+
+    {% include 'structure/tasks/includes/active_elements.html' %}
 
 
-	<p class="display-6">sent_audio:</p>
+    <p class="display-6">search_elements:</p>
 
-	<p class="display-6">active_elements:</p>
+    <form class="d-flex nav-item my-lg-0" method="GET">
+        <input class="form-control me-2" type="search" placeholder="Search" name="search_key">
+        <button class="btn btn-outline-success" type="submit">Search</button>
+    </form>
 
-	<p class="display-6">search_elements:</p>
+    <div class="search_elems">
+        <div class="search_grammars">
+            {% for grammar in grammars %}
+                <div class="list-group" data-task_pk="{{ object.pk }}">
+                    <a href="" class="list-group-item list-group-item-action"
+                       data-grammar_id="{{ grammar.pk }}">{{ grammar }}</a>
+                </div>
+            {% endfor %}
+        </div>
 
+        <div class="search_words">
+            {% for word in words %}
+                <div class="list-group" data-task_pk="{{ object.pk }}">
+                    <a href="" class="list-group-item list-group-item-action"
+                       data-word_id="{{ word.pk }}">{{ word }}</a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script src="{{ STATIC_PREFIX }}js/activate_word.js" defer></script>
+    <script src="{{ STATIC_PREFIX }}js/activate_grammar.js" defer></script>
+    <script src="{{ STATIC_PREFIX }}js/remove_element.js" defer></script>
+    <script src="{{ STATIC_PREFIX }}js/add_element.js" defer></script>
+    <script src="{{ STATIC_PREFIX }}js/remove_wrong_sent.js" defer></script>
 
 {% endblock %}

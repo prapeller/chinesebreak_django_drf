@@ -1,0 +1,27 @@
+{% load get_index %}
+
+<div class="task-sents">
+    <div class="right-sent-box">
+        <div class="rs_pinyin-box">
+            {{ sent_right.0 }}
+        </div>
+        <div class="rs_char-box">
+            {{ sent_right.1 }}
+        </div>
+    </div>
+    {% for sent_wrong in sent_wrong_list %}
+        <div class="wrong-sent-box" data-sent_wrong_idx="{{ sent_wrong_list|get_index:sent_wrong }}" data-task_pk="{{ object.pk }}">
+            <div class="ws_pinyin">
+                {{ sent_wrong.0 }}
+            </div>
+            <div class="ws_char">
+                {{ sent_wrong.1 }}
+            </div>
+            <div class="right-up-btn-box">
+                <button class="btn-close"></button>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+

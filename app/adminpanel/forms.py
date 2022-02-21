@@ -62,6 +62,13 @@ class TaskForm(forms.ModelForm):
     sent_lang_B = forms.CharField(label='sent_lang_B', widget=forms.TextInput(attrs={'class': 'form-control'}), required=False)
     sent_lit_B = forms.CharField(label='sent_lit_B', widget=forms.TextInput(attrs={'class': 'form-control'}), required=False)
 
+    sent_wrong_pinyin = forms.CharField(label='sent_wrong_pinyin',
+                                        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'sent_wrong_pinyin'}),
+                                        required=False)
+    sent_wrong_char = forms.CharField(label='sent_wrong_char',
+                                      widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'sent_wrong_char'}),
+                                      required=False)
+
     class Meta:
         model = Task
         fields = ('video',
@@ -69,8 +76,8 @@ class TaskForm(forms.ModelForm):
                   'sent_audio_A',
                   'sent_audio_B',
                   'sent_char_A', 'sent_pinyin_A', 'sent_lang_A', 'sent_lit_A',
-                  'sent_char_B', 'sent_pinyin_B', 'sent_lang_B', 'sent_lit_B')
-
+                  'sent_char_B', 'sent_pinyin_B', 'sent_lang_B', 'sent_lit_B',
+                  )
 
 
 class WordForm(forms.ModelForm):
