@@ -22,7 +22,7 @@
 
         {#  task_sents  #}
         <p class="display-6">task_sents:</p>
-        {% include 'structure/tasks/includes/task_sents.html' %}
+        {% include 'structure/tasks/includes/task_sents_from_lang.html' %}
         {{ form.sent_wrong_pinyin }}
         {{ form.sent_wrong_char }}
         <input type="submit" class="btn btn_add" value=""></input>
@@ -40,9 +40,8 @@
         {{ form.sent_lit_A }}
 
         {# sent_audio_A #}
-        <p class="display-6">sent_audio:</p>
-
         <div class="mt-5">
+        <p class="display-6">sent_audio:</p>
             {% if object.sent_audio_A %}
                 <audio controls class="br_20 shadow_light">
                     <source src="{{ object.sent_audio_A.url }}">

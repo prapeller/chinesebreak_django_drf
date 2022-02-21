@@ -38,9 +38,8 @@
         {{ form.sent_lit_A }}
 
         {# sent_audio_A #}
-        <p class="display-6">sent_audio:</p>
-
         <div class="mt-5">
+        <p class="display-6">sent_audio:</p>
             {% if object.sent_audio_A %}
                 <audio controls class="br_20 shadow_light">
                     <source src="{{ object.sent_audio_A.url }}">

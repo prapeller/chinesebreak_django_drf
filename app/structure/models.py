@@ -181,9 +181,9 @@ class Task(models.Model):
     def __str__(self):
         return f'{self.task_type}_{self.get_task_type_display()}_id_{self.pk}'
 
-    def add_sent_wrong(self, sent_wrong_pinyin, sent_wrong_char):
-        if sent_wrong_pinyin and sent_wrong_char:
-            self.sent_wrong.append([sent_wrong_pinyin, sent_wrong_char])
+    def add_sent_wrong(self, sent_wrong_pinyin: list = None, sent_wrong_char: list = None, sent_wrong_lang: list = None):
+        if (sent_wrong_pinyin and sent_wrong_char) or sent_wrong_lang:
+            self.sent_wrong.append([sent_wrong_pinyin, sent_wrong_char, sent_wrong_lang])
             self.save()
 
     def get_task_words(self):
@@ -239,7 +239,7 @@ class Task(models.Model):
                         sent_audio_B_url=None):
         if sent_audio_A_file:
             ext = sent_audio_A_file.name.split('.')[-1]
-            self.video.save(name=f'{ext}', content=File(sent_audio_A_file), save=True)
+            self.sent_audio_A.save(name=f'{ext}', content=File(sent_audio_A_file), save=True)
 
         if sent_audio_A_url and not sent_audio_A_file:
             resp = requests.get(sent_audio_A_url)
@@ -253,7 +253,7 @@ class Task(models.Model):
 
         if sent_audio_B_file:
             ext = sent_audio_B_file.name.split('.')[-1]
-            self.video.save(name=f'{ext}', content=File(sent_audio_B_file), save=True)
+            self.sent_audio_B.save(name=f'{ext}', content=File(sent_audio_B_file), save=True)
 
         if sent_audio_B_url and not sent_audio_B_file:
             resp = requests.get(sent_audio_B_url)

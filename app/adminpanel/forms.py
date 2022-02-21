@@ -68,6 +68,9 @@ class TaskForm(forms.ModelForm):
     sent_wrong_char = forms.CharField(label='sent_wrong_char',
                                       widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'sent_wrong_char'}),
                                       required=False)
+    sent_wrong_lang = forms.CharField(label='sent_wrong_lang',
+                                      widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'sent_wrong_lang'}),
+                                      required=False)
 
     class Meta:
         model = Task

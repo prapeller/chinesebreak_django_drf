@@ -210,6 +210,7 @@ def task_update_with_ajax(request, pk):
     task = Task.objects.get(pk=pk)
 
     act_deact_word_idx = request.GET.get('act_deact_word_idx')
+    act_deact_to_display_word_idx = request.GET.get('act_deact_to_display_word_idx')
     act_deact_grammar_for_word_idx = request.GET.get('act_deact_grammar_for_word_idx')
     remove_word_idx = request.GET.get('remove_word_idx')
     add_word_id = request.GET.get('add_word_id')
@@ -230,6 +231,12 @@ def task_update_with_ajax(request, pk):
         word_task_grammars = [word[2] for word in task.words]
         if not 1 in word_task_grammars:
             task.grammar = None
+        task.save()
+
+    if act_deact_to_display_word_idx:
+        idx = int(act_deact_to_display_word_idx)
+        word = task.words[idx]
+        word[3] = 0 if word[3] == 1 else 1
         task.save()
 
     if remove_word_idx:
@@ -267,7 +274,11 @@ def task_update_with_ajax(request, pk):
     task_words_html = render_to_string(f'structure/tasks/includes/task_words.html', context, request)
     active_elements_html = render_to_string(f'structure/tasks/includes/active_elements.html', context, request)
     sent_images_html = render_to_string(f'structure/tasks/includes/sent_images.html', context, request)
-    task_sents_html = render_to_string(f'structure/tasks/includes/task_sents.html', context, request)
+    if 'from_lang' in task.get_task_type_display():
+        task_sents_html = render_to_string(f'structure/tasks/includes/task_sents_from_lang.html', context, request)
+    if any([x in task.get_task_type_display() for x in ['from_char', 'from_video']]):
+        task_sents_html = render_to_string(f'structure/tasks/includes/task_sents_from_char.html', context, request)
+
     return JsonResponse({
         'active_elements_html': active_elements_html,
         'task_words_html': task_words_html,
@@ -449,32 +460,199 @@ class TaskType_7_UpdateView(UpdateView):
 
 class TaskType_8_UpdateView(UpdateView):
     model = Task
-    fields = '__all__'
-    template_name = 'structure/tasks/8_sent_lang_from_char.html'
+    fields = ()
+    extra_context = {}
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.template_name = f'structure/tasks/{self.object.task_type}_{self.object.get_task_type_display()}.html'
+
+        self.extra_context.update({
+            'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
+            'form': TaskForm(instance=self.object),
+            'task_words': self.object.get_task_words(),
+            'task_grammar': self.object.grammar,
+            'words': Word.objects.all(),
+            'grammars': Grammar.objects.all(),
+            'sent_right': self.object.sent_lang_A,
+            'sent_wrong_list': self.object.sent_wrong,
+        })
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        self.object.add_sent_wrong(
+            sent_wrong_lang=form.data.get('sent_wrong_lang'),
+        )
+
+        self.object.save_task_sent(
+            sent_lang_A=form.data.get('sent_lang_A'),
+            sent_lit_A=form.data.get('sent_lit_A')
+        )
+
+        self.object.save_task_audio(
+            sent_audio_A_file=form.files.get('sent_audio_A'),
+            sent_audio_A_url=form.data.get('sent_audio_A_url')
+        )
+
+        self.success_url = reverse_lazy(f'adminpanel:task_type_{self.object.task_type}_update', kwargs={'pk': self.object.pk})
+        return super().form_valid(form)
 
 
 class TaskType_9_UpdateView(UpdateView):
     model = Task
-    fields = '__all__'
-    template_name = 'structure/tasks/9_sent_lang_from_video.html'
+    fields = ()
+    extra_context = {}
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.template_name = f'structure/tasks/{self.object.task_type}_{self.object.get_task_type_display()}.html'
+
+        self.extra_context.update({
+            'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
+            'form': TaskForm(instance=self.object),
+            'task_words': self.object.get_task_words(),
+            'task_grammar': self.object.grammar,
+            'words': Word.objects.all(),
+            'grammars': Grammar.objects.all(),
+            'sent_right': self.object.sent_lang_A,
+            'sent_wrong_list': self.object.sent_wrong,
+        })
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        self.object.save_task_video(
+            video_file=form.files.get('video'),
+            video_url=form.data.get('video_url')
+        )
+
+        self.object.add_sent_wrong(
+            sent_wrong_lang=form.data.get('sent_wrong_lang'),
+        )
+
+        self.object.save_task_sent(
+            sent_lang_A=form.data.get('sent_lang_A'),
+            sent_lit_A=form.data.get('sent_lit_A')
+        )
+
+        self.object.save_task_audio(
+            sent_audio_A_file=form.files.get('sent_audio_A'),
+            sent_audio_A_url=form.data.get('sent_audio_A_url')
+        )
+
+        self.success_url = reverse_lazy(f'adminpanel:task_type_{self.object.task_type}_update', kwargs={'pk': self.object.pk})
+        return super().form_valid(form)
 
 
 class TaskType_10_UpdateView(UpdateView):
     model = Task
-    fields = '__all__'
-    template_name = 'structure/tasks/10_sent_say_from_char.html'
+    fields = ()
+    extra_context = {}
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.template_name = f'structure/tasks/{self.object.task_type}_{self.object.get_task_type_display()}.html'
+
+        self.extra_context.update({
+            'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
+            'form': TaskForm(instance=self.object),
+            'task_words': self.object.get_task_words(),
+            'task_grammar': self.object.grammar,
+            'words': Word.objects.all(),
+            'grammars': Grammar.objects.all(),
+        })
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        self.object.save_task_sent(
+            sent_lang_A=form.data.get('sent_lang_A'),
+            sent_lit_A=form.data.get('sent_lit_A')
+        )
+
+        self.object.save_task_audio(
+            sent_audio_A_file=form.files.get('sent_audio_A'),
+            sent_audio_A_url=form.data.get('sent_audio_A_url')
+        )
+
+        self.success_url = reverse_lazy(f'adminpanel:task_type_{self.object.task_type}_update', kwargs={'pk': self.object.pk})
+        return super().form_valid(form)
 
 
 class TaskType_11_UpdateView(UpdateView):
     model = Task
-    fields = '__all__'
-    template_name = 'structure/tasks/11_sent_say_from_video.html'
+    fields = ()
+    extra_context = {}
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.template_name = f'structure/tasks/{self.object.task_type}_{self.object.get_task_type_display()}.html'
+
+        self.extra_context.update({
+            'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
+            'form': TaskForm(instance=self.object),
+            'task_words': self.object.get_task_words(),
+            'task_grammar': self.object.grammar,
+            'words': Word.objects.all(),
+            'grammars': Grammar.objects.all(),
+        })
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        self.object.save_task_video(
+            video_file=form.files.get('video'),
+            video_url=form.data.get('video_url')
+        )
+
+        self.object.save_task_sent(
+            sent_lang_A=form.data.get('sent_lang_A'),
+            sent_lit_A=form.data.get('sent_lit_A')
+        )
+
+        self.object.save_task_audio(
+            sent_audio_A_file=form.files.get('sent_audio_A'),
+            sent_audio_A_url=form.data.get('sent_audio_A_url')
+        )
+
+        self.success_url = reverse_lazy(f'adminpanel:task_type_{self.object.task_type}_update', kwargs={'pk': self.object.pk})
+        return super().form_valid(form)
 
 
 class TaskType_12_UpdateView(UpdateView):
     model = Task
-    fields = '__all__'
-    template_name = 'structure/tasks/12_sent_paste_from_char.html'
+    fields = ()
+    extra_context = {}
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.template_name = f'structure/tasks/{self.object.task_type}_{self.object.get_task_type_display()}.html'
+
+        self.extra_context.update({
+            'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
+            'form': TaskForm(instance=self.object),
+            'task_words': self.object.get_task_words(),
+            'task_grammar': self.object.grammar,
+            'words': Word.objects.all(),
+            'grammars': Grammar.objects.all(),
+        })
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        self.object.save_task_sent(
+            sent_lang_A=form.data.get('sent_lang_A'),
+            sent_lit_A=form.data.get('sent_lit_A')
+        )
+
+        self.object.save_task_image(
+            image_file=form.files.get('image'),
+            image_url=form.data.get('image_url')
+        )
+
+        self.object.save_task_audio(
+            sent_audio_A_file=form.files.get('sent_audio_A'),
+            sent_audio_A_url=form.data.get('sent_audio_A_url')
+        )
+
+        self.success_url = reverse_lazy(f'adminpanel:task_type_{self.object.task_type}_update', kwargs={'pk': self.object.pk})
+        return super().form_valid(form)
 
 
 class TaskType_13_UpdateView(UpdateView):

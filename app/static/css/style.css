@@ -353,10 +353,13 @@
     border-color: #bdbdbd !important;
 }
 
-
-.display-word-checkbox {
+.display-word-checkbox:checked {
     background-color: #8eff57 !important;
     border-color: #8eff57 !important;
+}
+.display-word-checkbox {
+    background-color: #f7f9ff !important;
+    border-color: #bdbdbd !important;
 }
 
 .right-sent-box {
