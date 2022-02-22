@@ -641,11 +641,6 @@ class TaskType_12_UpdateView(UpdateView):
             sent_lit_A=form.data.get('sent_lit_A')
         )
 
-        self.object.save_task_image(
-            image_file=form.files.get('image'),
-            image_url=form.data.get('image_url')
-        )
-
         self.object.save_task_audio(
             sent_audio_A_file=form.files.get('sent_audio_A'),
             sent_audio_A_url=form.data.get('sent_audio_A_url')
@@ -657,8 +652,39 @@ class TaskType_12_UpdateView(UpdateView):
 
 class TaskType_13_UpdateView(UpdateView):
     model = Task
-    fields = '__all__'
-    template_name = 'structure/tasks/13_sent_choose_from_char.html'
+    fields = ()
+    extra_context = {}
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.template_name = f'structure/tasks/{self.object.task_type}_{self.object.get_task_type_display()}.html'
+        task_words = self.object.get_task_words()
+
+        self.extra_context.update({
+            'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
+            'wrong_words': [Word.objects.get(id=word_id) for word_id in self.object.words_wrong],
+            'form': TaskForm(instance=self.object),
+            'task_words': task_words,
+            'active_words': [word[1] for word in task_words if word[2] == 1],
+            'task_grammar': self.object.grammar,
+            'words': Word.objects.all().order_by('id'),
+            'grammars': Grammar.objects.all(),
+        })
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        self.object.save_task_sent(
+            sent_lang_A=form.data.get('sent_lang_A'),
+            sent_lit_A=form.data.get('sent_lit_A')
+        )
+
+        self.object.save_task_audio(
+            sent_audio_A_file=form.files.get('sent_audio_A'),
+            sent_audio_A_url=form.data.get('sent_audio_A_url')
+        )
+
+        self.success_url = reverse_lazy(f'adminpanel:task_type_{self.object.task_type}_update', kwargs={'pk': self.object.pk})
+        return super().form_valid(form)
 
 
 class TaskType_14_UpdateView(UpdateView):
