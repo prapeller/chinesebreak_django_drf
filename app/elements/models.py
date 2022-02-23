@@ -69,7 +69,7 @@ class Word(models.Model):
                              validators=[FileExtensionValidator(['mp4'])])
 
     def __str__(self):
-        return f'{self.pinyin}_{self.char}_{self.lang}_({self.lit})'
+        return f'{self.pinyin}_{self.char}_{self.lang}_({self.lit})_id_{self.pk}'
 
     def save_audio_with_url(self, url):
         resp = requests.get(url)

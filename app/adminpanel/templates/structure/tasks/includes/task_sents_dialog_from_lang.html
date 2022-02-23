@@ -1,6 +1,6 @@
 {% load get_index %}
 
-
+<p class="display-6">sent_A?:</p>
 <div class="right-sent-box">
     <div class="rs_pinyin-box">
         {{ sent_right.0 }}
@@ -9,6 +9,7 @@
         {{ sent_right.1 }}
     </div>
 </div>
+
 {% for sent_wrong in sent_wrong_list %}
     <div class="wrong-sent-box" data-sent_wrong_idx="{{ sent_wrong_list|get_index:sent_wrong }}" data-task_pk="{{ object.pk }}">
         <div class="ws_pinyin">
@@ -22,6 +23,5 @@
         </div>
     </div>
 {% endfor %}
-
 
 

@@ -1,0 +1,5 @@
+{% if object.video %}
+    <video class="video" src="{{ object.video.url }}" alt="ooops" controls></video>
+{% else %}
+    <video class="video" src="" controls></video>
+{% endif %}

@@ -1,0 +1,7 @@
+<div class="back-btn-box">
+    <a class="back-btn-small" href="{% url 'adminpanel:lesson_update' object.lesson.pk %}"></a>
+</div>
+<div class="header-text">
+    <h1 class="display-5 fw-bold">{{ object.get_task_type_display }}</h1>
+    <p>{{ object }}</p>
+</div>

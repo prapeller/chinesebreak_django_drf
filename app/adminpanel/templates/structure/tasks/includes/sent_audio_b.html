@@ -1,0 +1,8 @@
+{% if object.sent_audio_B %}
+    <audio controls class="br_20 shadow_light">
+        <source src="{{ object.sent_audio_B.url }}">
+    </audio>
+{% else %}
+    <audio controls class="br_20 shadow_light">
+    </audio>
+{% endif %}

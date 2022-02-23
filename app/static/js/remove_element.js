@@ -1,6 +1,7 @@
 'use strict'
 
 $('.task-words').on('click', '.btn-close', e => {
+    e.preventDefault()
 
     let delButton = e.target
 

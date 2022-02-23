@@ -1,0 +1,8 @@
+<div class="search-grammars-list">
+    {% for grammar in search_grammars_list %}
+        <div class="list-group">
+            <a class="list-group-item list-group-item-action" data-grammar_pk="{{ grammar.pk }}"
+               data-task_pk="{{ object.pk }}">{{ grammar }}</a>
+        </div>
+    {% endfor %}
+</div>

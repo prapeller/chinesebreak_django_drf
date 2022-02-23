@@ -159,6 +159,7 @@
 .active-word {
     border: 4px solid #929CFF;
 }
+
 .active-grammar {
     border: 4px solid #ffebb6;
 }
@@ -171,6 +172,12 @@
 .inactive-grammar {
     border: 4px solid #bdbdbd;
 }
+
+.wrong-word {
+    position: relative;
+    border: 4px solid #FF819C;
+}
+
 .right-sent-image {
     border: 4px solid #929CFF;
 }
@@ -240,7 +247,7 @@
 }
 
 .under-word-btn-box {
-    margin: 5px auto !important;
+    margin: 1px auto !important;
 }
 
 .form-switch {
@@ -358,6 +365,14 @@
     border-color: #8eff57 !important;
 }
 .display-word-checkbox {
+    background-color: #f7f9ff !important;
+    border-color: #bdbdbd !important;
+}
+.delete-word-checkbox:checked {
+    background-color: #FF819C !important;
+    border-color: #FF819C !important;
+}
+.delete-word-checkbox {
     background-color: #f7f9ff !important;
     border-color: #bdbdbd !important;
 }

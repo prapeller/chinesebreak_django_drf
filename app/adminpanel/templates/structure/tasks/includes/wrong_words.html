@@ -1,0 +1,14 @@
+<div class="wrong-words">
+    {% for word in wrong_words %}
+        <div class="task-word-box wrong-word" data-word_pk="{{ word.pk }}" data-task_pk="{{ object.pk }}">
+            <div>
+                <div class="cb_pinyin">{{ word.pinyin }}</div>
+                <div class="cb_char">{{ word.char }}</div>
+            </div>
+
+            <div class="right-up-btn-box">
+                <button class="btn-close"></button>
+            </div>
+        </div>
+    {% endfor %}
+</div>

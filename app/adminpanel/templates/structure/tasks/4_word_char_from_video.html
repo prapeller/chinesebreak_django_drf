@@ -6,61 +6,49 @@
 
 {% block content %}
 
+    <!-- header -->
     <div class="header words-task-type">
-        <div class="back-btn-box">
-            <a class="back-btn-small" href="{% url 'adminpanel:lesson_update' object.lesson.pk %}"></a>
-        </div>
-        <div class="header-text">
-            <h1 class="display-5 fw-bold">{{ object.get_task_type_display }}</h1>
-            <p>{{ object }}</p>
-        </div>
+        {% include 'structure/tasks/includes/task_header.html' %}
     </div>
-
-    <p class="display-6">task_video:</p>
 
     {#  form #}
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="form-group">
 
-            {% if object.video %}
-                <video class="video" src="{{ object.video.url }}" alt="ooops" controls></video>
-            {% else %}
-                <video class="video" src="" controls></video>
-            {% endif %}
-
+            <!-- task video -->
+            <p class="display-6">task_video:</p>
+            <div class="task-video">
+                {% include 'structure/tasks/includes/task_video.html' %}
+            </div>
             {{ form.video }}
             {{ form.video_url }}
 
+            <!-- submit btn -->
             <div class="d-grid">
                 <input type="submit" class="btn btn_ok mt-2 mb-2" value=""></input>
             </div>
+        </div>
     </form>
 
-    <p class="display-6">task_words:</p>
+    <!-- task words -->
+    <p class="display-6 mt-5">task_words:</p>
+    <div class="task-words">
+        {% include 'structure/tasks/includes/task_words_active_words.html' %}
+    </div>
 
-    {% include 'structure/tasks/includes/task_words.html' %}
-
-    <p class="display-6">active_elements:</p>
-
-    {% include 'structure/tasks/includes/active_elements.html' %}
-
+    <!-- search elements -->
     <p class="display-6">search_elements:</p>
-
-    <form class="d-flex nav-item my-lg-0" method="GET">
-        <input class="form-control me-2" type="search" placeholder="Search" name="search_key">
-        <button class="btn btn-outline-success" type="submit">Search</button>
-    </form>
-
     <div class="search_elems">
         <div class="search_words">
-            {% for word in words %}
-                <div class="list-group" data-task_pk="{{ object.pk }}">
-                    <a href="" class="list-group-item list-group-item-action word-to-add"
-                       data-word_id="{{ word.pk }}">{{ word }}</a>
-                </div>
-            {% endfor %}
+            {% include 'structure/tasks/includes/search_words.html' %}
         </div>
+    </div>
+
+    <!-- active elements -->
+    <p class="display-6">active_elements:</p>
+    <div class="active-elements">
+        {% include 'structure/tasks/includes/active_elements.html' %}
     </div>
 
     <!-- delete btn -->
@@ -74,5 +62,7 @@
     <script src="{{ STATIC_PREFIX }}js/activate_word.js" defer></script>
     <script src="{{ STATIC_PREFIX }}js/remove_element.js" defer></script>
     <script src="{{ STATIC_PREFIX }}js/add_element.js" defer></script>
+
+    <script src="{{ STATIC_PREFIX }}js/search_word.js" defer></script>
 
 {% endblock %}

@@ -6,25 +6,34 @@
 
 {% block content %}
 
+    <!-- header -->
     <div class="header sent-task-type">
-        <div class="back-btn-box">
-            <a class="back-btn-small" href="{% url 'adminpanel:lesson_update' object.lesson.pk %}"></a>
-        </div>
-        <div class="header-text">
-            <h1 class="display-5 fw-bold">{{ object.get_task_type_display }}</h1>
-            <p>{{ object }}</p>
-        </div>
+        {% include 'structure/tasks/includes/task_header.html' %}
     </div>
+
 
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
 
-        {#   task_words #}
-        <p class="display-6">task_words:</p>
-        {% include 'structure/tasks/includes/task_words.html' %}
+        <!-- task words -->
+        <p class="display-6 mt-5">task_words:</p>
+        <div class="task-words">
+            {% include 'structure/tasks/includes/task_words_active_words_grammared_words_to_display_words.html' %}
+        </div>
+
+        <!-- search elements -->
+        <p class="display-6 mt-5">search_elements:</p>
+        <div class="search_elems">
+            <div class="search_words">
+                {% include 'structure/tasks/includes/search_words.html' %}
+            </div>
+            <div class="search_grammars">
+            {% include 'structure/tasks/includes/search_grammars.html' %}
+            </div>
+        </div>
 
         {# sent_lang_A #}
-        <p class="display-6">sent_lang:</p>
+        <p class="display-6 mt-5">sent_lang:</p>
         {{ form.sent_lang_A }}
 
         {# sent_lit_A #}
@@ -32,16 +41,8 @@
         {{ form.sent_lit_A }}
 
         {# sent_audio_A #}
-        <div class="mt-5">
-            <p class="display-6">sent_audio:</p>
-            {% if object.sent_audio_A %}
-                <audio controls class="br_20 shadow_light">
-                    <source src="{{ object.sent_audio_A.url }}">
-                </audio>
-            {% else %}
-                <audio controls class="br_20 shadow_light">
-                </audio>
-            {% endif %}
+        <div class="sent-audio-A mt-5">
+            {% include 'structure/tasks/includes/sent_audio_a.html' %}
         </div>
         {{ form.sent_audio_A }}
         {{ form.sent_audio_A_url }}
@@ -52,44 +53,31 @@
         </div>
     </form>
 
+    <!-- active elements -->
     <p class="display-6">active_elements:</p>
-
-    {% include 'structure/tasks/includes/active_elements.html' %}
-
-
-    <p class="display-6">search_elements:</p>
-
-    <form class="d-flex nav-item my-lg-0" method="GET">
-        <input class="form-control me-2" type="search" placeholder="Search" name="search_key">
-        <button class="btn btn-outline-success" type="submit">Search</button>
-    </form>
-
-    <div class="search_elems">
-        <div class="search_grammars">
-            {% for grammar in grammars %}
-                <div class="list-group" data-task_pk="{{ object.pk }}">
-                    <a href="" class="list-group-item list-group-item-action"
-                       data-grammar_id="{{ grammar.pk }}">{{ grammar }}</a>
-                </div>
-            {% endfor %}
-        </div>
-
-        <div class="search_words">
-            {% for word in words %}
-                <div class="list-group" data-task_pk="{{ object.pk }}">
-                    <a href="" class="list-group-item list-group-item-action"
-                       data-word_id="{{ word.pk }}">{{ word }}</a>
-                </div>
-            {% endfor %}
-        </div>
+    <div class="active-elements">
+        {% include 'structure/tasks/includes/active_elements.html' %}
     </div>
+
+    <!-- delete btn -->
+    <div class="d-grid">
+        <button type="button" class="btn_del" data-bs-toggle="modal" data-bs-target="#exampleModal" data-type="tasks"
+                data-pk="{{ object.pk }}" data-app="structure"></button>
+    </div>
+    {% include 'includes/inn_delete_modal.html' %}
+
 
     <script src="{{ STATIC_PREFIX }}js/activate_word.js" defer></script>
     <script src="{{ STATIC_PREFIX }}js/activate_grammar.js" defer></script>
     <script src="{{ STATIC_PREFIX }}js/activate_word_to_display.js" defer></script>
+    <script src="{{ STATIC_PREFIX }}js/activate_word_to_delete.js" defer></script>
     <script src="{{ STATIC_PREFIX }}js/remove_element.js" defer></script>
     <script src="{{ STATIC_PREFIX }}js/add_element.js" defer></script>
     <script src="{{ STATIC_PREFIX }}js/remove_sent_image.js" defer></script>
+
+    <script src="{{ STATIC_PREFIX }}js/search_word.js" defer></script>
+    <script src="{{ STATIC_PREFIX }}js/search_grammar.js" defer></script>
+
 
 
 {% endblock %}

@@ -1,0 +1,5 @@
+{% for word in search_words_list %}
+    <div class="list-group">
+        <a class="list-group-item list-group-item-action" data-word_pk="{{ word.pk }}" data-task_pk="{{ object.pk }}">{{ word }}</a>
+    </div>
+{% endfor %}

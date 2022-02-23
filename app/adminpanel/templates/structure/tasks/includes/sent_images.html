@@ -1,23 +1,21 @@
 {% load get_index %}
 
-<div class="sent-images">
-    {% for sent_image in sent_images %}
-        {% if sent_images|get_index:sent_image == 0 %}
-            <div class="sent-image" data-sent_image_idx="{{ sent_images|get_index:sent_image }}" data-task_pk="{{ object.pk }}">
-                <div class="image-box"><img class="image right-sent-image" src="{{ sent_image }}" alt="ooops"></div>
-                <div class="right-up-btn-box">
-                    <button class="btn-close"></button>
-                </div>
+{% for sent_image in sent_images %}
+    {% if sent_images|get_index:sent_image == 0 %}
+        <div class="sent-image" data-sent_image_idx="{{ sent_images|get_index:sent_image }}" data-task_pk="{{ object.pk }}">
+            <div class="image-box"><img class="image right-sent-image" src="{{ sent_image }}" alt="ooops"></div>
+            <div class="right-up-btn-box">
+                <button class="btn-close"></button>
             </div>
-        {% else %}
-            <div class="sent-image" data-sent_image_idx="{{ sent_images|get_index:sent_image }}" data-task_pk="{{ object.pk }}">
-                <div class="image-box"><img class="image wrong-sent-image" src="{{ sent_image }}" alt="ooops"></div>
-                <div class="right-up-btn-box">
-                    <button class="btn-close"></button>
-                </div>
+        </div>
+    {% else %}
+        <div class="sent-image" data-sent_image_idx="{{ sent_images|get_index:sent_image }}" data-task_pk="{{ object.pk }}">
+            <div class="image-box"><img class="image wrong-sent-image" src="{{ sent_image }}" alt="ooops"></div>
+            <div class="right-up-btn-box">
+                <button class="btn-close"></button>
             </div>
-        {% endif %}
-    {% endfor %}
-</div>
+        </div>
+    {% endif %}
+{% endfor %}
 
 

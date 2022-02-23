@@ -5,23 +5,25 @@ $('.search_elems').on('click', '.list-group-item', e => {
 
     let addButton = e.target
 
-    let taskPk = parseInt(addButton.parentElement.dataset.task_pk)
-    let wordId = parseInt(addButton.dataset.word_id)
-    let grammarId = parseInt(addButton.dataset.grammar_id)
+    let taskPk = parseInt(addButton.dataset.task_pk)
+    let wordPk = parseInt(addButton.dataset.word_pk)
+    let grammarPk = parseInt(addButton.dataset.grammar_pk)
 
-    if (wordId) {
+    console.log(taskPk, wordPk, grammarPk)
+
+    if (wordPk) {
     $.ajax(
         {
-            url: `/adminpanel/structure/tasks/update_with_ajax/${taskPk}/?add_word_id=${wordId}`,
+            url: `/adminpanel/structure/tasks/update_with_ajax/${taskPk}/?add_word_id=${wordPk}`,
             success: data => {
                 $('.task-words').html(data.task_words_html)
             }
         })
     }
-    if (grammarId) {
+    if (grammarPk) {
     $.ajax(
         {
-            url: `/adminpanel/structure/tasks/update_with_ajax/${taskPk}/?add_grammar_id=${grammarId}`,
+            url: `/adminpanel/structure/tasks/update_with_ajax/${taskPk}/?add_grammar_id=${grammarPk}`,
             success: data => {
                 $('.active-elements').html(data.active_elements_html)
             }

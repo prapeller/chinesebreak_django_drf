@@ -1,25 +1,10 @@
-<div class="choose-words">
-
-    {% for active_word in active_words %}
-        <div class="task-word-box active-word">
-            <div>
-                <div class="cb_pinyin">{{ active_word.pinyin }}</div>
-                <div class="cb_char">{{ active_word.char }}</div>
-            </div>
+{% for active_word in active_words %}
+    <div class="task-word-box active-word">
+        <div>
+            <div class="cb_pinyin">{{ active_word.pinyin }}</div>
+            <div class="cb_char">{{ active_word.char }}</div>
         </div>
-    {% endfor %}
+    </div>
+{% endfor %}
 
-
-    {% for word in wrong_words %}
-        <div class="task-word-box inactive-word">
-            <div>
-                <div class="cb_pinyin">{{ word.pinyin }}</div>
-                <div class="cb_char">{{ word.char }}</div>
-            </div>
-
-            <div class="right-up-btn-box">
-                <button class="btn-close"></button>
-            </div>
-        </div>
-    {% endfor %}
-</div>
+{% include 'structure/tasks/includes/wrong_words.html' %}
