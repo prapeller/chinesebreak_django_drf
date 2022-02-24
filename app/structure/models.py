@@ -94,34 +94,34 @@ def default_2d_array():
 
 class Task(models.Model):
     TASK_TYPES = [
-        ('1', 'word_image'),
-        ('2', 'word_char_from_lang'),
-        ('3', 'word_lang_from_char'),
-        ('4', 'word_char_from_video'),
-        ('5', 'word_match'),
+        ('1', '1_word_image'),
+        ('2', '2_word_char_from_lang'),
+        ('3', '3_word_lang_from_char'),
+        ('4', '4_word_char_from_video'),
+        ('5', '5_word_match'),
 
-        ('6', 'sent_image'),
-        ('7', 'sent_char_from_lang'),
-        ('8', 'sent_lang_from_char'),
-        ('9', 'sent_lang_from_video'),
-        ('10', 'sent_say_from_char'),
-        ('11', 'sent_say_from_video'),
-        ('12', 'sent_paste_from_char'),
-        ('13', 'sent_choose_from_char'),
-        ('14', 'sent_delete_from_char'),
+        ('6', '6_sent_image'),
+        ('7', '7_sent_char_from_lang'),
+        ('8', '8_sent_lang_from_char'),
+        ('9', '9_sent_lang_from_video'),
+        ('10', '10_sent_say_from_char'),
+        ('11', '11_sent_say_from_video'),
+        ('12', '12_sent_paste_from_char'),
+        ('13', '13_sent_choose_from_char'),
+        ('14', '14_sent_delete_from_char'),
 
-        ('15', 'dialog_A'),
-        ('16', 'dialog_B'),
-        ('17', 'dialog_A_puzzle_char_from_char'),
-        ('18', 'dialog_B_puzzle_char_from_char'),
+        ('15', '15_dialog_A'),
+        ('16', '16_dialog_B'),
+        ('17', '17_dialog_A_puzzle_char_from_char'),
+        ('18', '18_dialog_B_puzzle_char_from_char'),
 
-        ('19', 'puzzle_char_from_lang'),
-        ('20', 'puzzle_lang_from_char'),
-        ('21', 'puzzle_char_from_video'),
+        ('19', '19_puzzle_char_from_lang'),
+        ('20', '20_puzzle_lang_from_char'),
+        ('21', '21_puzzle_char_from_video'),
 
-        ('22', 'word_write_from_video'),
-        ('23', 'grammar_choose_from_video'),
-        ('24', 'draw_character')
+        ('22', '22_word_write_from_video'),
+        ('23', '23_grammar_choose_from_video'),
+        ('24', '24_draw_character')
     ]
 
     task_type = models.CharField(max_length=2, choices=TASK_TYPES)
@@ -179,7 +179,7 @@ class Task(models.Model):
                              validators=[FileExtensionValidator(['mp4'])])
 
     def __str__(self):
-        return f'{self.task_type}_{self.get_task_type_display()}_id_{self.pk}'
+        return f'{self.get_task_type_display()}_id_{self.pk}'
 
     def add_sent_wrong(self, sent_wrong_pinyin: list = None, sent_wrong_char: list = None, sent_wrong_lang: list = None):
         if (sent_wrong_pinyin and sent_wrong_char) or sent_wrong_lang:
