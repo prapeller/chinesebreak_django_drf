@@ -72,7 +72,7 @@
     </div>
 
     <!-- add task word_write_from_video -->
-    <form action="{% url 'adminpanel:word_update' pk=object.pk %}" method="post">
+    <form action="{% url 'adminpanel:word_update' pk=object.pk%}" method="post">
         {% csrf_token %}
         <div class="d-grid">
             <input type="hidden" name="task_type" value="22">

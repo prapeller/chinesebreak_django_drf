@@ -342,6 +342,8 @@ def task_update_with_ajax(request, pk):
     if task.task_type in ('14',):
         task_words_html = render_to_string(
             f'structure/tasks/includes/task_words_active_words_grammared_words_to_display_words_to_delete_words.html', context, request)
+    if task.task_type in ('22',):
+        task_words_html = render_to_string(f'structure/tasks/includes/task_words_to_display_words.html', context, request)
 
     search_wrong_words_list_html = render_to_string(f'structure/tasks/includes/search_wrong_words_list.html', context, request)
     wrong_words_html = render_to_string(f'structure/tasks/includes/wrong_words.html', context, request)
@@ -1075,8 +1077,39 @@ class TaskType_21_UpdateView(UpdateView):
 
 class TaskType_22_UpdateView(UpdateView):
     model = Task
-    fields = '__all__'
-    template_name = 'structure/tasks/22_word_write_from_video.html'
+    fields = ()
+    extra_context = {}
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.template_name = f'structure/tasks/{self.object.get_task_type_display()}.html'
+        task_words = self.object.get_task_words()
+
+        self.extra_context.update({
+            'title': f'{self.object.get_task_type_display()}',
+            'form': TaskForm(instance=self.object),
+            'active_word': self.object.word,
+            'task_words': task_words,
+        })
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        self.object.save_task_sent(
+            sent_lang_A=form.data.get('sent_lang_A'),
+            sent_lit_A=form.data.get('sent_lit_A')
+        )
+
+        self.object.save_task_audio(
+            sent_audio_A_file=form.files.get('sent_audio_A'),
+            sent_audio_A_url=form.data.get('sent_audio_A_url')
+        )
+
+        self.object.save_task_video(
+            video_file=form.files.get('video'),
+            video_url=form.data.get('video_url')
+        )
+        self.success_url = reverse_lazy(f'adminpanel:task_type_{self.object.task_type}_update', kwargs={'pk': self.object.pk})
+        return super().form_valid(form)
 
 
 class TaskType_23_UpdateView(UpdateView):
@@ -1119,12 +1152,12 @@ class WordUpdateView(UpdateView):
     def post(self, request, *args, **kwargs):
         task_type = request.POST.get('task_type')
         if task_type:
-            new_task = Task.objects.create(
+            task, is_created = Task.objects.get_or_create(
                 task_type=task_type,
                 creator=request.user,
-                word=self.object,
+                word=self.get_object(),
             )
-            return redirect_to_task_type(task_type, new_task.pk)
+            return redirect_to_task_type(task_type, task.pk)
         return super().post(request, *args, **kwargs)
 
 
