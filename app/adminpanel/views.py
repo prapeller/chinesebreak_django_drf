@@ -1088,25 +1088,22 @@ class TaskType_22_UpdateView(UpdateView):
         self.extra_context.update({
             'title': f'{self.object.get_task_type_display()}',
             'form': TaskForm(instance=self.object),
-            'active_word': self.object.word,
             'task_words': task_words,
         })
         return super().get(request, *args, **kwargs)
 
     def form_valid(self, form):
+        self.object.save_task_video(
+            video_file=form.files.get('video'),
+            video_url=form.data.get('video_url')
+        )
         self.object.save_task_sent(
             sent_lang_A=form.data.get('sent_lang_A'),
             sent_lit_A=form.data.get('sent_lit_A')
         )
-
         self.object.save_task_audio(
             sent_audio_A_file=form.files.get('sent_audio_A'),
             sent_audio_A_url=form.data.get('sent_audio_A_url')
-        )
-
-        self.object.save_task_video(
-            video_file=form.files.get('video'),
-            video_url=form.data.get('video_url')
         )
         self.success_url = reverse_lazy(f'adminpanel:task_type_{self.object.task_type}_update', kwargs={'pk': self.object.pk})
         return super().form_valid(form)
@@ -1114,8 +1111,36 @@ class TaskType_22_UpdateView(UpdateView):
 
 class TaskType_23_UpdateView(UpdateView):
     model = Task
-    fields = '__all__'
-    template_name = 'structure/tasks/23_grammar_choose_from_video.html'
+    fields = ()
+    extra_context = {}
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.template_name = f'structure/tasks/{self.object.get_task_type_display()}.html'
+
+        self.extra_context.update({
+            'title': f'{self.object.get_task_type_display()}',
+            'form': TaskForm(instance=self.object),
+        })
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        self.object.save_task_video(
+            video_file=form.files.get('video'),
+            video_url=form.data.get('video_url')
+        )
+        self.object.save_task_sent(
+            sent_pinyin_A=form.data.get('sent_pinyin_A'),
+            sent_char_A=form.data.get('sent_char_A'),
+            sent_lang_A=form.data.get('sent_lang_A'),
+            sent_lit_A=form.data.get('sent_lit_A')
+        )
+        self.object.save_task_audio(
+            sent_audio_A_file=form.files.get('sent_audio_A'),
+            sent_audio_A_url=form.data.get('sent_audio_A_url')
+        )
+        self.success_url = reverse_lazy(f'adminpanel:task_type_{self.object.task_type}_update', kwargs={'pk': self.object.pk})
+        return super().form_valid(form)
 
 
 class WordListView(ListView):
@@ -1198,12 +1223,12 @@ class GrammarUpdateView(UpdateView):
     def post(self, request, *args, **kwargs):
         task_type = request.POST.get('task_type')
         if task_type:
-            new_task = Task.objects.create(
+            task, is_created = Task.objects.get_or_create(
                 task_type=task_type,
                 creator=request.user,
-                grammar=self.object,
+                grammar=self.get_object(),
             )
-            return redirect_to_task_type(task_type, new_task.pk)
+            return redirect_to_task_type(task_type, task.pk)
         return super().post(request, *args, **kwargs)
 
 
