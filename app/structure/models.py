@@ -110,8 +110,8 @@ class Task(models.Model):
         ('13', 'sent_choose_from_char'),
         ('14', 'sent_delete_from_char'),
 
-        ('15', 'dialog_A_char_from_char'),
-        ('16', 'dialog_B_char_from_video'),
+        ('15', 'dialog_A'),
+        ('16', 'dialog_B'),
         ('17', 'dialog_A_puzzle_char_from_char'),
         ('18', 'dialog_B_puzzle_char_from_char'),
 

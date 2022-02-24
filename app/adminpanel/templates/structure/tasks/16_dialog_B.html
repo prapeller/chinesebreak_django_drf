@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ task_type.id }}_{{ task_type.name }}
+{% endblock %}
+
+
+{% block content %}
+
+    <!-- header -->
+    <div class="header dialog-task-type">
+        {% include 'structure/tasks/includes/task_header.html' %}
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- task video -->
+        <p class="display-6">task_video:</p>
+        <div class="task-video">
+            {% include 'structure/tasks/includes/task_video.html' %}
+        </div>
+        {{ form.video }}
+        {{ form.video_url }}
+
+        <!-- submit btn -->
+        <div class="d-grid">
+            <input type="submit" class="btn btn_ok mt-2 mb-2" value=""></input>
+        </div>
+
+        {# sent_char_A #}
+        <p class="display-6 mt-5">sent_char_A:</p>
+        {{ form.sent_char_A }}
+
+        {# sent_pinyin_A #}
+        <p class="display-6">sent_pinyin_A:</p>
+        {{ form.sent_pinyin_A }}
+
+        {# sent_lang_A #}
+        <p class="display-6">sent_lang_A:</p>
+        {{ form.sent_lang_A }}
+
+        {# sent_lit_A #}
+        <p class="display-6">sent_lit_A:</p>
+        {{ form.sent_lit_A }}
+
+
+        {# sent_audio_A #}
+        <p class="display-6">sent_audio_A:</p>
+        <div class="sent-audio-A">
+            {% include 'structure/tasks/includes/sent_audio_a.html' %}
+        </div>
+        {{ form.sent_audio_A }}
+        {{ form.sent_audio_A_url }}
+
+        {#  sent_A #}
+        <p class="display-6">sent_A:</p>
+        <div class="right-sent-box">
+            <div class="rs_pinyin-box">
+                {{ object.sent_pinyin_A }}
+            </div>
+            <div class="rs_char-box">
+                {{ object.sent_char_A }}
+            </div>
+        </div>
+        {#  task_sents  #}
+
+        <p class="display-6 mt-5">task_sents:</p>
+        <div class="task-sents">
+            {% include 'structure/tasks/includes/task_sents_dialog_from_video.html' %}
+        </div>
+        {{ form.sent_wrong_pinyin }}
+        {{ form.sent_wrong_char }}
+        <input type="submit" class="btn btn_add" value=""></input>
+
+        <!-- task words -->
+        <p class="display-6">task_words:</p>
+        <div class="task-words">
+            {% include 'structure/tasks/includes/task_words_active_words_grammared_words.html' %}
+        </div>
+
+        <!-- search elements -->
+        <p class="display-6 mt-5">search_elements:</p>
+        <div class="search_elems">
+            <div class="search_words">
+                {% include 'structure/tasks/includes/search_words.html' %}
+            </div>
+            <div class="search_grammars">
+                {% include 'structure/tasks/includes/search_grammars.html' %}
+            </div>
+        </div>
+
+        {# sent_lang_B #}
+        <p class="display-6">sent_lang_B:</p>
+        {{ form.sent_lang_B }}
+
+        {# sent_lit_B #}
+        <p class="display-6">sent_lit_B:</p>
+        {{ form.sent_lit_B }}
+
+        {# sent_audio_B #}
+        <p class="display-6">sent_audio_B:</p>
+        <div class="sent-audio-A mt-5">
+            {% include 'structure/tasks/includes/sent_audio_b.html' %}
+        </div>
+        {{ form.sent_audio_B }}
+        {{ form.sent_audio_B_url }}
+
+        <!-- submit btn -->
+        <div class="d-grid">
+            <input type="submit" class="btn btn_ok mt-2 mb-2" value=""></input>
+        </div>
+    </form>
+
+    <!-- active elements -->
+    <p class="display-6">active_elements:</p>
+    <div class="active-elements">
+        {% include 'structure/tasks/includes/active_elements.html' %}
+    </div>
+
+    <!-- delete btn -->
+    <div class="d-grid">
+        <button type="button" class="btn_del" data-bs-toggle="modal" data-bs-target="#exampleModal" data-type="tasks"
+                data-pk="{{ object.pk }}" data-app="structure"></button>
+    </div>
+    {% include 'includes/inn_delete_modal.html' %}
+
+
+    <script src="{{ STATIC_PREFIX }}js/activate_word.js" defer></script>
+    <script src="{{ STATIC_PREFIX }}js/activate_grammar.js" defer></script>
+    <script src="{{ STATIC_PREFIX }}js/remove_element.js" defer></script>
+    <script src="{{ STATIC_PREFIX }}js/add_element.js" defer></script>
+    <script src="{{ STATIC_PREFIX }}js/remove_wrong_sent.js" defer></script>
+
+    <script src="{{ STATIC_PREFIX }}js/search_word.js" defer></script>
+    <script src="{{ STATIC_PREFIX }}js/search_grammar.js" defer></script>
+
+{% endblock %}

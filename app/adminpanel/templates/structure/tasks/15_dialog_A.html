@@ -17,6 +17,7 @@
 
         {#  task_sents  #}
         <p class="display-6 mt-5">task_sents:</p>
+        <p class="display-6">sent_A?:</p>
         <div class="task-sents">
             {% include 'structure/tasks/includes/task_sents_dialog_from_lang.html' %}
         </div>
@@ -114,8 +115,10 @@
 
     <script src="{{ STATIC_PREFIX }}js/activate_word.js" defer></script>
     <script src="{{ STATIC_PREFIX }}js/activate_grammar.js" defer></script>
+
     <script src="{{ STATIC_PREFIX }}js/remove_element.js" defer></script>
     <script src="{{ STATIC_PREFIX }}js/add_element.js" defer></script>
+
     <script src="{{ STATIC_PREFIX }}js/remove_wrong_sent.js" defer></script>
 
     <script src="{{ STATIC_PREFIX }}js/search_word.js" defer></script>

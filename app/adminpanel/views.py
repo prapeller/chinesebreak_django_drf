@@ -320,10 +320,11 @@ def task_update_with_ajax(request, pk):
                'search_words_list': search_words_list,
                'search_grammars_list': search_grammars_list,
                }
+
     task_words_html = ''
     if task.task_type in ('1', '2', '3', '4', '5'):
         task_words_html = render_to_string(f'structure/tasks/includes/task_words_active_words.html', context, request)
-    if task.task_type in ('6', '7', '8', '9', '13', '15'):
+    if task.task_type in ('6', '7', '8', '9', '13', '15', '16'):
         task_words_html = render_to_string(f'structure/tasks/includes/task_words_active_words_grammared_words.html', context, request)
     if task.task_type in ('10', '11', '12'):
         task_words_html = render_to_string(f'structure/tasks/includes/task_words_active_words_grammared_words_to_display_words.html', context, request)
@@ -338,7 +339,11 @@ def task_update_with_ajax(request, pk):
     sent_images_html = render_to_string(f'structure/tasks/includes/sent_images.html', context, request)
 
     task_sents_html = ''
-    if 'from_lang' in task.get_task_type_display():
+    if any([x in task.get_task_type_display() for x in ['dialog_A']]):
+        task_sents_html = render_to_string(f'structure/tasks/includes/task_sents_dialog_from_lang.html', context, request)
+    if any([x in task.get_task_type_display() for x in ['dialog_B']]):
+        task_sents_html = render_to_string(f'structure/tasks/includes/task_sents_dialog_from_video.html', context, request)
+    if any([x in task.get_task_type_display() for x in ['from_lang']]):
         task_sents_html = render_to_string(f'structure/tasks/includes/task_sents_from_lang.html', context, request)
     if any([x in task.get_task_type_display() for x in ['from_char', 'from_video']]):
         task_sents_html = render_to_string(f'structure/tasks/includes/task_sents_from_char.html', context, request)
@@ -815,8 +820,53 @@ class TaskType_15_UpdateView(UpdateView):
 
 class TaskType_16_UpdateView(UpdateView):
     model = Task
-    fields = '__all__'
-    template_name = 'structure/tasks/16_dialog_B_char_from_video.html'
+    fields = ()
+    extra_context = {}
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.template_name = f'structure/tasks/{self.object.task_type}_{self.object.get_task_type_display()}.html'
+
+        self.extra_context.update({
+            'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
+            'form': TaskForm(instance=self.object),
+            'task_words': self.object.get_task_words(),
+            'task_grammar': self.object.grammar,
+            'sent_right': self.object.get_right_sent_from_task_words(),
+            'sent_wrong_list': self.object.sent_wrong,
+        })
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        self.object.save_task_video(
+            video_file=form.files.get('video'),
+            video_url=form.data.get('video_url')
+        )
+
+        self.object.add_sent_wrong(
+            sent_wrong_pinyin=form.data.get('sent_wrong_pinyin'),
+            sent_wrong_char=form.data.get('sent_wrong_char')
+        )
+
+        self.object.save_task_sent(
+            sent_char_A=form.data.get('sent_char_A'),
+            sent_pinyin_A=form.data.get('sent_pinyin_A'),
+            sent_lang_A=form.data.get('sent_lang_A'),
+            sent_lit_A=form.data.get('sent_lit_A'),
+
+            sent_lang_B=form.data.get('sent_lang_B'),
+            sent_lit_B=form.data.get('sent_lit_B'),
+        )
+
+        self.object.save_task_audio(
+            sent_audio_A_file=form.files.get('sent_audio_A'),
+            sent_audio_A_url=form.data.get('sent_audio_A_url'),
+            sent_audio_B_file=form.files.get('sent_audio_B_file'),
+            sent_audio_B_url=form.data.get('sent_audio_B_url'),
+        )
+
+        self.success_url = reverse_lazy(f'adminpanel:task_type_{self.object.task_type}_update', kwargs={'pk': self.object.pk})
+        return super().form_valid(form)
 
 
 class TaskType_17_UpdateView(UpdateView):
