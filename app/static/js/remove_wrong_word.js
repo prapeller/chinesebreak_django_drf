@@ -1,6 +1,6 @@
 'use strict'
 
-$('.choose-words').on('click', '.btn-close', e => {
+$('.wrong-words').on('click', '.btn-close', e => {
     e.preventDefault()
 
     let delButton = e.target

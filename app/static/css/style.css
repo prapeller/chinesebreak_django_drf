@@ -177,6 +177,10 @@
     position: relative;
     border: 4px solid #FF819C;
 }
+.right-word {
+    position: relative;
+    border: 4px solid #929CFF;
+}
 
 .right-sent-image {
     border: 4px solid #929CFF;

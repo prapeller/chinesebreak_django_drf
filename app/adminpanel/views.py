@@ -210,31 +210,15 @@ class TaskUpdateView(UpdateView):
 def task_update_with_ajax(request, pk):
     task = Task.objects.get(pk=pk)
 
+
     act_deact_word_idx = request.GET.get('act_deact_word_idx')
-    act_deact_to_display_word_idx = request.GET.get('act_deact_to_display_word_idx')
-    act_deact_to_delete_word_idx = request.GET.get('act_deact_to_delete_word_idx')
-    act_deact_grammar_for_word_idx = request.GET.get('act_deact_grammar_for_word_idx')
-
-    remove_word_idx = request.GET.get('remove_word_idx')
-    add_word_id = request.GET.get('add_word_id')
-    add_grammar_id = request.GET.get('add_grammar_id')
-
-    remove_sent_image_idx = request.GET.get('remove_sent_image_idx')
-    remove_sent_wrong_idx = request.GET.get('remove_sent_wrong_idx')
-
-    search_wrong_words = request.GET.get('search_wrong_words')
-    add_wrong_word_word_id = request.GET.get('add_wrong_word_word_id')
-    remove_wrong_word = request.GET.get('remove_wrong_word')
-
-    search_words = request.GET.get('search_words')
-    search_grammars = request.GET.get('search_grammars')
-
     if act_deact_word_idx:
         idx = int(act_deact_word_idx)
         word = task.words[idx]
         word[1] = 0 if word[1] == 1 else 1
         task.save()
 
+    act_deact_grammar_for_word_idx = request.GET.get('act_deact_grammar_for_word_idx')
     if act_deact_grammar_for_word_idx:
         idx = int(act_deact_grammar_for_word_idx)
         word = task.words[idx]
@@ -244,55 +228,65 @@ def task_update_with_ajax(request, pk):
             task.grammar = None
         task.save()
 
+    act_deact_to_display_word_idx = request.GET.get('act_deact_to_display_word_idx')
     if act_deact_to_display_word_idx:
         idx = int(act_deact_to_display_word_idx)
         word = task.words[idx]
         word[3] = 0 if word[3] == 1 else 1
         task.save()
 
+    act_deact_to_delete_word_idx = request.GET.get('act_deact_to_delete_word_idx')
     if act_deact_to_delete_word_idx:
         idx = int(act_deact_to_delete_word_idx)
         word = task.words[idx]
         word[4] = 0 if word[4] == 1 else 1
         task.save()
 
+    remove_word_idx = request.GET.get('remove_word_idx')
     if remove_word_idx:
         idx = int(remove_word_idx)
         task.words.pop(idx)
         task.save()
 
+    add_word_id = request.GET.get('add_word_id')
     if add_word_id:
         word_id = int(add_word_id)
         task.words.append([word_id, 0, 0, 0, 0])
         task.save()
 
+    add_grammar_id = request.GET.get('add_grammar_id')
     if add_grammar_id:
         id = int(add_grammar_id)
         task.grammar = Grammar.objects.get(id=id)
         task.save()
 
+    remove_sent_image_idx = request.GET.get('remove_sent_image_idx')
     if remove_sent_image_idx:
         idx = int(remove_sent_image_idx)
         task.sent_images.pop(idx)
         task.save()
 
+    remove_sent_wrong_idx = request.GET.get('remove_sent_wrong_idx')
     if remove_sent_wrong_idx:
         idx = int(remove_sent_wrong_idx)
         task.sent_wrong.pop(idx)
         task.save()
 
+    search_wrong_words = request.GET.get('search_wrong_words')
     search_wrong_words_list = []
     if search_wrong_words:
         search_wrong_words_list = Word.objects.filter(
             Q(pinyin__icontains=search_wrong_words) | Q(char__icontains=search_wrong_words) | Q(lang__icontains=search_wrong_words)
         )
 
+    search_words = request.GET.get('search_words')
     search_words_list = []
     if search_words:
         search_words_list = Word.objects.filter(
             Q(pinyin__icontains=search_words) | Q(char__icontains=search_words) | Q(lang__icontains=search_words)
         )
 
+    search_grammars = request.GET.get('search_grammars')
     search_grammars_list = []
     if search_grammars:
         search_grammars_list = Grammar.objects.filter(
@@ -300,13 +294,27 @@ def task_update_with_ajax(request, pk):
                 lang__icontains=search_grammars)
         )
 
+    remove_wrong_word = request.GET.get('remove_wrong_word')
     if remove_wrong_word:
         word_pk = int(remove_wrong_word)
         task.words_wrong.remove(word_pk)
         task.save()
 
+    add_wrong_word_word_id = request.GET.get('add_wrong_word_word_id')
     if add_wrong_word_word_id:
         task.words_wrong.append(int(add_wrong_word_word_id))
+        task.save()
+
+    remove_lang_puzzle_word_right = request.GET.get('remove_lang_puzzle_word_right')
+    if remove_lang_puzzle_word_right:
+        idx = int(remove_lang_puzzle_word_right)
+        task.lang_puzzle_words_right.pop(idx)
+        task.save()
+
+    remove_lang_puzzle_word_wrong = request.GET.get('remove_lang_puzzle_word_wrong')
+    if remove_lang_puzzle_word_wrong:
+        idx = int(remove_lang_puzzle_word_wrong)
+        task.lang_puzzle_words_wrong.pop(idx)
         task.save()
 
     context = {'object': Task.objects.get(pk=pk),
@@ -320,14 +328,16 @@ def task_update_with_ajax(request, pk):
                'search_wrong_words_list': search_wrong_words_list,
                'search_words_list': search_words_list,
                'search_grammars_list': search_grammars_list,
+               'lang_puzzle_words_right': task.lang_puzzle_words_right,
+               'lang_puzzle_words_wrong': task.lang_puzzle_words_wrong,
                }
 
     task_words_html = ''
     if task.task_type in ('1', '2', '3', '4', '5'):
         task_words_html = render_to_string(f'structure/tasks/includes/task_words_active_words.html', context, request)
-    if task.task_type in ('6', '7', '8', '9', '13', '15', '16',):
+    if task.task_type in ('6', '7', '8', '9', '13', '15', '16','20'):
         task_words_html = render_to_string(f'structure/tasks/includes/task_words_active_words_grammared_words.html', context, request)
-    if task.task_type in ('10', '11', '12', '17', '18', '19', '20'):
+    if task.task_type in ('10', '11', '12', '17', '18', '19'):
         task_words_html = render_to_string(f'structure/tasks/includes/task_words_active_words_grammared_words_to_display_words.html',
                                            context, request)
     if task.task_type in ('14',):
@@ -351,6 +361,9 @@ def task_update_with_ajax(request, pk):
     if any([x in task.get_task_type_display() for x in ['from_char', 'from_video']]):
         task_sents_html = render_to_string(f'structure/tasks/includes/task_sents_from_char.html', context, request)
 
+    lang_puzzle_words_right_html = render_to_string(f'structure/tasks/includes/lang_puzzle_words_right.html', context, request)
+    lang_puzzle_words_wrong_html = render_to_string(f'structure/tasks/includes/lang_puzzle_words_wrong.html', context, request)
+
     return JsonResponse({
         'active_elements_html': active_elements_html,
         'task_words_html': task_words_html,
@@ -360,6 +373,8 @@ def task_update_with_ajax(request, pk):
         'search_wrong_words_list_html': search_wrong_words_list_html,
         'search_words_list_html': search_words_list_html,
         'search_grammars_list_html': search_grammars_list_html,
+        'lang_puzzle_words_right_html': lang_puzzle_words_right_html,
+        'lang_puzzle_words_wrong_html': lang_puzzle_words_wrong_html,
     })
 
 
@@ -387,7 +402,7 @@ class TaskType_2_UpdateView(UpdateView):
         self.object = self.get_object()
         self.template_name = f'structure/tasks/{self.object.get_task_type_display()}.html'
         self.extra_context.update({
-            'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
+            'title': f'{self.object.get_task_type_display()}',
             'task_words': self.object.get_task_words(),
         })
         return super().get(request, *args, **kwargs)
@@ -402,7 +417,7 @@ class TaskType_3_UpdateView(UpdateView):
         self.object = self.get_object()
         self.template_name = f'structure/tasks/{self.object.get_task_type_display()}.html'
         self.extra_context.update({
-            'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
+            'title': f'{self.object.get_task_type_display()}',
             'task_words': self.object.get_task_words(),
         })
         return super().get(request, *args, **kwargs)
@@ -419,7 +434,7 @@ class TaskType_4_UpdateView(UpdateView):
         self.success_url = reverse_lazy('adminpanel:task_type_4_update', kwargs={'pk': self.object.pk})
         self.extra_context.update({
             'form': TaskForm(instance=self.object),
-            'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
+            'title': f'{self.object.get_task_type_display()}',
             'task_words': self.object.get_task_words(),
         })
         return super().get(request, *args, **kwargs)
@@ -442,7 +457,7 @@ class TaskType_5_UpdateView(UpdateView):
         self.object = self.get_object()
         self.template_name = f'structure/tasks/{self.object.get_task_type_display()}.html'
         self.extra_context.update({
-            'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
+            'title': f'{self.object.get_task_type_display()}',
             'task_words': self.object.get_task_words(),
         })
         return super().get(request, *args, **kwargs)
@@ -458,7 +473,7 @@ class TaskType_6_UpdateView(UpdateView):
         self.template_name = f'structure/tasks/{self.object.get_task_type_display()}.html'
 
         self.extra_context.update({
-            'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
+            'title': f'{self.object.get_task_type_display()}',
             'form': TaskForm(instance=self.object),
             'sent_images': self.object.sent_images,
             'task_words': self.object.get_task_words(),
@@ -496,7 +511,7 @@ class TaskType_7_UpdateView(UpdateView):
         self.template_name = f'structure/tasks/{self.object.get_task_type_display()}.html'
 
         self.extra_context.update({
-            'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
+            'title': f'{self.object.get_task_type_display()}',
             'form': TaskForm(instance=self.object),
             'task_words': self.object.get_task_words(),
             'task_grammar': self.object.grammar,
@@ -535,7 +550,7 @@ class TaskType_8_UpdateView(UpdateView):
         self.template_name = f'structure/tasks/{self.object.get_task_type_display()}.html'
 
         self.extra_context.update({
-            'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
+            'title': f'{self.object.get_task_type_display()}',
             'form': TaskForm(instance=self.object),
             'task_words': self.object.get_task_words(),
             'task_grammar': self.object.grammar,
@@ -573,7 +588,7 @@ class TaskType_9_UpdateView(UpdateView):
         self.template_name = f'structure/tasks/{self.object.get_task_type_display()}.html'
 
         self.extra_context.update({
-            'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
+            'title': f'{self.object.get_task_type_display()}',
             'form': TaskForm(instance=self.object),
             'task_words': self.object.get_task_words(),
             'task_grammar': self.object.grammar,
@@ -616,7 +631,7 @@ class TaskType_10_UpdateView(UpdateView):
         self.template_name = f'structure/tasks/{self.object.get_task_type_display()}.html'
 
         self.extra_context.update({
-            'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
+            'title': f'{self.object.get_task_type_display()}',
             'form': TaskForm(instance=self.object),
             'task_words': self.object.get_task_words(),
             'task_grammar': self.object.grammar,
@@ -648,7 +663,7 @@ class TaskType_11_UpdateView(UpdateView):
         self.template_name = f'structure/tasks/{self.object.get_task_type_display()}.html'
 
         self.extra_context.update({
-            'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
+            'title': f'{self.object.get_task_type_display()}',
             'form': TaskForm(instance=self.object),
             'task_words': self.object.get_task_words(),
             'task_grammar': self.object.grammar,
@@ -685,7 +700,7 @@ class TaskType_12_UpdateView(UpdateView):
         self.template_name = f'structure/tasks/{self.object.get_task_type_display()}.html'
 
         self.extra_context.update({
-            'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
+            'title': f'{self.object.get_task_type_display()}',
             'form': TaskForm(instance=self.object),
             'task_words': self.object.get_task_words(),
             'task_grammar': self.object.grammar,
@@ -718,7 +733,7 @@ class TaskType_13_UpdateView(UpdateView):
         task_words = self.object.get_task_words()
 
         self.extra_context.update({
-            'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
+            'title': f'{self.object.get_task_type_display()}',
             'form': TaskForm(instance=self.object),
             'active_words': [word[1] for word in task_words if word[2] == 1],
             'wrong_words': [Word.objects.get(id=word_id) for word_id in self.object.words_wrong],
@@ -753,7 +768,7 @@ class TaskType_14_UpdateView(UpdateView):
         task_words = self.object.get_task_words()
 
         self.extra_context.update({
-            'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
+            'title': f'{self.object.get_task_type_display()}',
             'form': TaskForm(instance=self.object),
             'active_words': [word[1] for word in task_words if word[2] == 1],
             'task_words': task_words,
@@ -786,7 +801,7 @@ class TaskType_15_UpdateView(UpdateView):
         self.template_name = f'structure/tasks/{self.object.get_task_type_display()}.html'
 
         self.extra_context.update({
-            'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
+            'title': f'{self.object.get_task_type_display()}',
             'form': TaskForm(instance=self.object),
             'task_words': self.object.get_task_words(),
             'task_grammar': self.object.grammar,
@@ -832,7 +847,7 @@ class TaskType_16_UpdateView(UpdateView):
         self.template_name = f'structure/tasks/{self.object.get_task_type_display()}.html'
 
         self.extra_context.update({
-            'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
+            'title': f'{self.object.get_task_type_display()}',
             'form': TaskForm(instance=self.object),
             'task_words': self.object.get_task_words(),
             'task_grammar': self.object.grammar,
@@ -883,7 +898,7 @@ class TaskType_17_UpdateView(UpdateView):
         self.template_name = f'structure/tasks/{self.object.get_task_type_display()}.html'
 
         self.extra_context.update({
-            'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
+            'title': f'{self.object.get_task_type_display()}',
             'form': TaskForm(instance=self.object),
             'task_words': self.object.get_task_words(),
             'task_grammar': self.object.grammar,
@@ -921,7 +936,7 @@ class TaskType_18_UpdateView(UpdateView):
         self.template_name = f'structure/tasks/{self.object.get_task_type_display()}.html'
 
         self.extra_context.update({
-            'title': f'{self.object.task_type}_{self.object.get_task_type_display}',
+            'title': f'{self.object.get_task_type_display()}',
             'form': TaskForm(instance=self.object),
             'task_words': self.object.get_task_words(),
             'task_grammar': self.object.grammar,
@@ -930,36 +945,93 @@ class TaskType_18_UpdateView(UpdateView):
 
     def form_valid(self, form):
         self.object.save_task_sent(
-            sent_char_A=form.data.get('sent_char_A'),
-            sent_pinyin_A=form.data.get('sent_pinyin_A'),
             sent_lang_A=form.data.get('sent_lang_A'),
             sent_lit_A=form.data.get('sent_lit_A'),
-            sent_lang_B=form.data.get('sent_lang_B'),
-            sent_lit_B=form.data.get('sent_lit_B'),
         )
 
         self.object.save_task_audio(
             sent_audio_A_file=form.files.get('sent_audio_A'),
             sent_audio_A_url=form.data.get('sent_audio_A_url'),
-            sent_audio_B_file=form.files.get('sent_audio_B'),
-            sent_audio_B_url=form.data.get('sent_audio_B_url'),
         )
 
         self.success_url = reverse_lazy(f'adminpanel:task_type_{self.object.task_type}_update', kwargs={'pk': self.object.pk})
         return super().form_valid(form)
 
 
-
 class TaskType_19_UpdateView(UpdateView):
     model = Task
-    fields = '__all__'
-    template_name = 'structure/tasks/19_puzzle_char_from_lang.html'
+    fields = ()
+    extra_context = {}
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.template_name = f'structure/tasks/{self.object.get_task_type_display()}.html'
+        task_words = self.object.get_task_words()
+
+        self.extra_context.update({
+            'title': f'{self.object.get_task_type_display()}',
+            'form': TaskForm(instance=self.object),
+            'active_words': [word[1] for word in task_words if word[2] == 1],
+            'wrong_words': [Word.objects.get(id=word_id) for word_id in self.object.words_wrong],
+            'task_words': task_words,
+            'task_grammar': self.object.grammar,
+        })
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        self.object.save_task_sent(
+            sent_lang_A=form.data.get('sent_lang_A'),
+            sent_lit_A=form.data.get('sent_lit_A')
+        )
+
+        self.object.save_task_audio(
+            sent_audio_A_file=form.files.get('sent_audio_A'),
+            sent_audio_A_url=form.data.get('sent_audio_A_url')
+        )
+
+        self.success_url = reverse_lazy(f'adminpanel:task_type_{self.object.task_type}_update', kwargs={'pk': self.object.pk})
+        return super().form_valid(form)
 
 
 class TaskType_20_UpdateView(UpdateView):
     model = Task
-    fields = '__all__'
-    template_name = 'structure/tasks/20_puzzle_lang_from_char.html'
+    fields = ()
+    extra_context = {}
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.template_name = f'structure/tasks/{self.object.get_task_type_display()}.html'
+        task_words = self.object.get_task_words()
+
+        self.extra_context.update({
+            'title': f'{self.object.get_task_type_display()}',
+            'form': TaskForm(instance=self.object),
+            'active_words': [word[1] for word in task_words if word[2] == 1],
+            'lang_puzzle_words_right': [word for word in self.object.lang_puzzle_words_right],
+            'lang_puzzle_words_wrong': [word for word in self.object.lang_puzzle_words_wrong],
+            'task_words': task_words,
+            'task_grammar': self.object.grammar,
+        })
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        self.object.save_task_sent(
+            sent_lang_A=form.data.get('sent_lang_A'),
+            sent_lit_A=form.data.get('sent_lit_A')
+        )
+
+        self.object.save_task_audio(
+            sent_audio_A_file=form.files.get('sent_audio_A'),
+            sent_audio_A_url=form.data.get('sent_audio_A_url')
+        )
+
+        self.object.add_lang_puzzle_word(
+            lang_puzzle_word_right=form.data.get('lang_puzzle_word_right'),
+            lang_puzzle_word_wrong=form.data.get('lang_puzzle_word_wrong'),
+        )
+
+        self.success_url = reverse_lazy(f'adminpanel:task_type_{self.object.task_type}_update', kwargs={'pk': self.object.pk})
+        return super().form_valid(form)
 
 
 class TaskType_21_UpdateView(UpdateView):

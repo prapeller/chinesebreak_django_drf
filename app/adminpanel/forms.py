@@ -72,6 +72,9 @@ class TaskForm(forms.ModelForm):
                                       widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'sent_wrong_lang'}),
                                       required=False)
 
+    lang_puzzle_word_wrong = forms.CharField(label='lang_puzzle_word_wrong', widget=forms.TextInput(attrs={'class': 'form-control'}), required=False)
+    lang_puzzle_word_right = forms.CharField(label='lang_puzzle_word_right', widget=forms.TextInput(attrs={'class': 'form-control'}), required=False)
+
     class Meta:
         model = Task
         fields = ('video',

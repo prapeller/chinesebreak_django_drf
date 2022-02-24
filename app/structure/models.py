@@ -89,7 +89,7 @@ def default_1d_array():
 
 
 def default_2d_array():
-    return [[], ]
+    return [[],[]]
 
 
 class Task(models.Model):
@@ -135,10 +135,12 @@ class Task(models.Model):
     # неправильные слова
     words_wrong = ArrayField(models.IntegerField(), null=True, default=default_1d_array)
 
+    # слова для паззла на родном языке
+    lang_puzzle_words_right = ArrayField(models.CharField(max_length=120, null=True, blank=True), null=True, default=default_1d_array)
+    lang_puzzle_words_wrong = ArrayField(models.CharField(max_length=120, null=True, blank=True), null=True, default=default_1d_array)
+
     # связанная грамматика
     grammar = models.ForeignKey(Grammar, on_delete=models.SET_NULL, null=True)
-    # используемые в предложениях грамматики [[id, 1], [id, 0]]: 1/0 -> активно/неактивно
-    grammars = ArrayField(ArrayField(models.IntegerField(), null=True), null=True, default=default_2d_array)
     # неправильные грамматики
     grammars_wrong = ArrayField(models.IntegerField(), null=True, default=default_1d_array)
 
@@ -184,6 +186,16 @@ class Task(models.Model):
     def add_sent_wrong(self, sent_wrong_pinyin: list = None, sent_wrong_char: list = None, sent_wrong_lang: list = None):
         if (sent_wrong_pinyin and sent_wrong_char) or sent_wrong_lang:
             self.sent_wrong.append([sent_wrong_pinyin, sent_wrong_char, sent_wrong_lang])
+            self.save()
+
+    def add_lang_puzzle_word(self,
+                             lang_puzzle_word_right: str = None,
+                             lang_puzzle_word_wrong: str = None):
+        if lang_puzzle_word_right:
+            self.lang_puzzle_words_right.append(lang_puzzle_word_right)
+            self.save()
+        if lang_puzzle_word_wrong:
+            self.lang_puzzle_words_wrong.append(lang_puzzle_word_wrong)
             self.save()
 
     def get_task_words(self):

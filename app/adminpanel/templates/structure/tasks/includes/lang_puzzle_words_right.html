@@ -1,0 +1,11 @@
+{% load get_index %}
+
+{% for word in lang_puzzle_words_right %}
+    <div class="task-word-box right-word" data-word_idx="{{ lang_puzzle_words_right|get_index:word }}" data-task_pk="{{ object.pk }}">
+            <div class="rs_lang">{{ word }}</div>
+
+        <div class="right-up-btn-box">
+            <button class="btn-close"></button>
+        </div>
+    </div>
+{% endfor %}
